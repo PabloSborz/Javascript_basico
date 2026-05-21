@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aula 4 - Feedback</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+body { background: #f0f2f5; padding-top: 60px; }
+/* Topbar */
+.topbar { position: fixed; top: 0; left: 0; right: 0; height: 60px; background: #fff; border-bottom: 1px solid #ddd; display: flex; align-items: center; justify-content: space-between; padding: 0 30px; z-index: 100; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+.topbar h1 { font-size: 20px; color: #333; }
+.topbar .clock { font-size: 16px; color: #666; }
+/* Subtopo */
+.subtopo { background: #fff; border-bottom: 1px solid #ddd; padding: 15px 30px; display: flex; align-items: center; justify-content: space-between; margin-top: 0; }
+.subtopo .info { font-size: 14px; color: #555; }
+.subtopo .badge { background: #17a2b8; color: #fff; padding: 5px 12px; border-radius: 20px; font-size: 12px; }
+/* Painel média */
+.painel { background: #fff; margin: 20px 30px; padding: 20px; border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+.painel h2 { font-size: 18px; margin-bottom: 10px; color: #333; }
+.painel .media { font-size: 48px; font-weight: bold; color: #17a2b8; }
+.painel .barra { height: 10px; background: #e9ecef; border-radius: 5px; margin-top: 10px; }
+.painel .barra .preenchimento { height: 100%; background: #17a2b8; border-radius: 5px; transition: width 0.3s; }
+/* Grid cards */
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; padding: 0 30px 40px; }
+.card { background: #fff; border-radius: 10px; padding: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+.card .header { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; }
+.card .avatar { width: 50px; height: 50px; border-radius: 50%; background: #17a2b8; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: bold; font-size: 20px; }
+.card .info h3 { font-size: 16px; color: #333; }
+.card .info .status { font-size: 12px; color: #888; }
+.card .stars { margin: 10px 0; display: flex; gap: 5px; }
+.card .stars span { cursor: pointer; font-size: 24px; color: #ccc; transition: color 0.2s; }
+.card .stars span.active { color: #f1c40f; }
+.card .criterios { margin: 10px 0; }
+.card .criterios label { display: block; font-size: 14px; color: #555; margin: 5px 0; }
+.card .criterios input { margin-right: 8px; }
+.card textarea { width: 100%; min-height: 60px; padding: 8px; border: 1px solid #ddd; border-radius: 5px; margin: 10px 0; resize: vertical; font-family: inherit; }
+.card .botoes { display: flex; gap: 10px; }
+.card .botoes button { padding: 8px 16px; border: none; border-radius: 5px; cursor: pointer; font-size: 14px; }
+.card .botoes .salvar { background: #28a745; color: #fff; }
+.card .botoes .excluir { background: #dc3545; color: #fff; }
+/* Botão adicionar */
+.btn-add { position: fixed; bottom: 30px; right: 30px; background: #007bff; color: #fff; border: none; border-radius: 50%; width: 60px; height: 60px; font-size: 30px; cursor: pointer; box-shadow: 0 4px 8px rgba(0,0,0,0.2); transition: transform 0.2s; }
+.btn-add:hover { transform: scale(1.1); }
+/* Modal */
+.modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 200; }
+.modal.active { display: flex; }
+.modal-content { background: #fff; width: 400px; padding: 30px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
+.modal-content h2 { margin-bottom: 20px; color: #333; }
+.modal-content input { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 5px; }
+.modal-content .modal-botoes { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
+.modal-content .modal-botoes button { padding: 8px 16px; border: none; border-radius: 5px; cursor: pointer; }
+.modal-content .modal-botoes .cancelar { background: #6c757d; color: #fff; }
+.modal-content .modal-botoes .confirmar { background: #007bff; color: #fff; }
+/* Footer */
+footer { text-align: center; padding: 20px; color: #888; font-size: 14px; border-top: 1px solid #ddd; background: #fff; }
+</style>
+</head>
+<body>
+
+<!-- Topbar -->
+<header class="topbar">
+  <h1>📊 Painel de Apresentações — Aula 4</h1>
+  <div class="clock" id="clock"></div>
+</header>
+
+<!-- Subtopo -->
+<div class="subtopo">
+  <div class="info">Aula 4 - Estruturas de Decisão — if/else, switch e operador ternário · 40 minutos</div>
+  <div class="badge" id="alunosBadge">0 alunos</div>
+</div>
+
+<!-- Painel média -->
+<div class="painel">
+  <h2>Média Geral de Estrelas</h2>
+  <div class="media" id="mediaGeral">0.0</div>
+  <div class="barra"><div class="preenchimento" id="barraProgresso" style="width: 0%;"></div></div>
+</div>
+
+<!-- Grid de cards -->
+<div class="grid" id="gridCards"></div>
+
+<!-- Botão adicionar aluno -->
+<button class="btn-add" id="btnAddAluno">+</button>
+
+<!-- Modal adicionar aluno -->
+<div class="modal" id="modalAddAluno">
+  <div class="modal-content">
+    <h2>Adicionar Aluno</h2>
+    <label for="nomeAluno">Nome do Aluno:</label>
+    <input type="text" id="nomeAluno" placeholder="Digite o nome">
+    <div class="modal-botoes">
+      <button class="cancelar" id="btnCancelarModal">Cancelar</button>
+      <button class="confirmar" id="btnConfirmarModal">Adicionar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Footer -->
+<footer>📊 Aula 4 · Projeto @karizeviecelli</footer>
+
+<script>
+// Função para atualizar relógio
+function updateClock() {
+  const now = new Date();
+  document.getElementById('clock').textContent = now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+// Chave do localStorage
+const STORAGE_KEY = 'feedback_aula4';
+
+// Dados iniciais
+let alunos = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+
+// Salvar dados
+function salvar() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(alunos));
+}
+
+// Renderizar tudo
+function renderizar() {
+  const grid = document.getElementById('gridCards');
+  grid.innerHTML = '';
+  alunos.forEach((aluno, index) => {
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.dataset.index = index;
+    
+    // Header
+    const header = document.createElement('div');
+    header.className = 'header';
+    const avatar = document.createElement('div');
+    avatar.className = 'avatar';
+    avatar.textContent = aluno.nome.charAt(0).toUpperCase();
+    const info = document.createElement('div');
+    info.className = 'info';
+    const h3 = document.createElement('h3');
+    h3.textContent = aluno.nome;
+    const status = document.createElement('div');
+    status.className = 'status';
+    status.textContent = aluno.status || 'Ativo';
+    info.appendChild(h3);
+    info.appendChild(status);
+    header.appendChild(avatar);
+    header.appendChild(info);
+    card.appendChild(header);
+    
+    // Estrelas
+    const starsDiv = document.createElement('div');
+    starsDiv.className = 'stars';
+    for (let i = 1; i <= 5; i++) {
+      const star = document.createElement('span');
+      star.textContent = '★';
+      star.dataset.value = i;
+      if (i <= (aluno.estrelas || 0)) star.classList.add('active');
+      starsDiv.appendChild(star);
+    }
+    card.appendChild(starsDiv);
+    
+    // Critérios
+    const criteriosDiv = document.createElement('div');
+    criteriosDiv.className = 'criterios';
+    const criterios = [
+      'Implementou if/else para decisões',
+      'Utilizou switch para múltiplos casos',
+      'Aplicou operador ternário',
+      'Avaliou condições com truthy/falsy',
+      'Código executa sem erros'
+    ];
+    criterios.forEach((criterio, idx) => {
+      const label = document.createElement('label');
+      const checkbox = document.createElement('input');
+      checkbox.type = 'checkbox';
+      checkbox.dataset.criterio = idx;
+      if (aluno.criterios && aluno.criterios[idx]) checkbox.checked = true;
+      label.appendChild(checkbox);
+      label.appendChild(document.createTextNode(' ' + criterio));
+      criteriosDiv.appendChild(label);
+    });
+    card.appendChild(criteriosDiv);
+    
+    // Textarea
+    const textarea = document.createElement('textarea');
+    textarea.placeholder = 'Observações...';
+    textarea.value = aluno.observacoes || '';
+    card.appendChild(textarea);
+    
+    // Botões
+    const botoes = document.createElement('div');
+    botoes.className = 'botoes';
+    const btnSalvar = document.createElement('button');
+    btnSalvar.className = 'salvar';
+    btnSalvar.textContent = 'Salvar';
+    const btnExcluir = document.createElement('button');
+    btnExcluir.className = 'excluir';
+    btnExcluir.textContent = 'Excluir';
+    botoes.appendChild(btnSalvar);
+    botoes.appendChild(btnExcluir);
+    card.appendChild(botoes);
+    
+    grid.appendChild(card);
+  });
+  atualizarPainel();
+}
+
+// Atualizar painel de média e badge
+function atualizarPainel() {
+  const total = alunos.length;
+  document.getElementById('alunosBadge').textContent = total + (total === 1 ? ' aluno' : ' alunos');
+  if (total === 0) {
+    document.getElementById('mediaGeral').textContent = '0.0';
+    document.getElementById('barraProgresso').style.width = '0%';
+    return;
+  }
+  let soma = 0;
+  alunos.forEach(a => soma += (a.estrelas || 0));
+  const media = soma / total;
+  document.getElementById('mediaGeral').textContent = media.toFixed(1);
+  document.getElementById('barraProgresso').style.width = (media / 5 * 100) + '%';
+}
+
+// Delegar eventos no grid (cliques em estrelas, checkboxes, textarea, botões)
+document.getElementById('gridCards').addEventListener('click', function(e) {
+  const card = e.target.closest('.card');
+  if (!card) return;
+  const index = parseInt(card.dataset.index);
+  
+  // Estrelas
+  if (e.target.closest('.stars') && e.target.tagName === 'SPAN') {
+    const value = parseInt(e.target.dataset.value);
+    alunos[index].estrelas = value;
+    salvar();
+    renderizar();
+  }
+  
+  // Botão salvar
+  if (e.target.classList.contains('salvar')) {
+    // Salvar observações e checkboxes
+    const textarea = card.querySelector('textarea');
+    alunos[index].observacoes = textarea.value;
+    const checks = card.querySelectorAll('input[type="checkbox"]');
+    alunos[index].criterios = Array.from(checks).map(c => c.checked);
+    // Atualizar status (opcional: poderia definir 'Concluído' se todos checkboxes marcados?)
+    const allChecked = Array.from(checks).every(c => c.checked);
+    alunos[index].status = allChecked ? 'Concluído' : 'Em andamento';
+    salvar();
+    renderizar();
+  }
+  
+  // Botão excluir
+  if (e.target.classList.contains('excluir')) {
+    if (confirm('Tem certeza que deseja excluir este aluno?')) {
+      alunos.splice(index, 1);
+      salvar();
+      renderizar();
+    }
+  }
+});
+
+// Delegar alterações em checkboxes e textarea (para salvar automaticamente? O botão salvar já faz, mas podemos salvar ao mudar? Não: mantém com botão)
+// Também precisamos ouvir input no textarea para atualizar dados sem salvar ainda? Não, só salva no clique do botão.
+
+// Modal
+document.getElementById('btnAddAluno').addEventListener('click', function() {
+  document.getElementById('modalAddAluno').classList.add('active');
+  document.getElementById('nomeAluno').value = '';
+  document.getElementById('nomeAluno').focus();
+});
+
+document.getElementById('btnCancelarModal').addEventListener('click', function() {
+  document.getElementById('modalAddAluno').classList.remove('active');
+});
+
+document.getElementById('btnConfirmarModal').addEventListener('click', function() {
+  const nome = document.getElementById('nomeAluno').value.trim();
+  if (nome === '') {
+    alert('Por favor, insira um nome.');
+    return;
+  }
+  // Verificar se já existe
+  if (alunos.some(a => a.nome === nome)) {
+    alert('Aluno já existe.');
+    return;
+  }
+  alunos.push({
+    nome: nome,
+    estrelas: 0,
+    criterios: [false, false, false, false, false],
+    observacoes: '',
+    status: 'Ativo'
+  });
+  salvar();
+  renderizar();
+  document.getElementById('modalAddAluno').classList.remove('active');
+});
+
+// Fechar modal clicando fora
+document.getElementById('modalAddAluno').addEventListener('click', function(e) {
+  if (e.target === this) {
+    this.classList.remove('active');
+  }
+});
+
+// Inicializar renderização
+renderizar();
+</script>
+</body>
+</html>
