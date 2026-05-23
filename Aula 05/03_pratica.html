@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aula 5 - Prática</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 20px;
+        }
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        .header h1 {
+            font-size: 1.5rem;
+        }
+        .timer-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background: #e0e0e0;
+            border-radius: 5px;
+            margin-bottom: 30px;
+        }
+        .progress-fill {
+            height: 100%;
+            background: #4caf50;
+            border-radius: 5px;
+            transition: width 0.3s;
+        }
+        .card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            overflow: hidden;
+        }
+        .card-header {
+            background: #fafafa;
+            padding: 12px 15px;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            user-select: none;
+        }
+        .card-header input[type="checkbox"] {
+            margin-right: 10px;
+            transform: scale(1.2);
+        }
+        .card-header .checkbox-label {
+            flex: 1;
+            font-weight: bold;
+        }
+        .card-body {
+            padding: 0 15px 15px;
+            display: none;
+        }
+        .card.open .card-body {
+            display: block;
+        }
+        .card-body p {
+            margin: 10px 0;
+        }
+        .gabarito-btn {
+            background: #2196f3;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 10px 0;
+        }
+        .gabarito-code {
+            background: #f0f0f0;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            display: none;
+        }
+        .gabarito-code.show {
+            display: block;
+        }
+        .cta {
+            display: none;
+            text-align: center;
+            margin: 30px 0 20px;
+            padding: 20px;
+            background: #e8f5e9;
+            border-radius: 8px;
+        }
+        .cta.show {
+            display: block;
+        }
+        .cta a {
+            display: inline-block;
+            background: #4caf50;
+            color: white;
+            padding: 12px 24px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            color: #777;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🛠 Aula 5 · Prática</h1>
+            <button class="timer-btn" id="timerBtn">⏸️</button>
+        </div>
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill" style="width: 0%;"></div>
+        </div>
+
+        <div id="cardsContainer">
+            <!-- Cards serão gerados via JS -->
+        </div>
+
+        <div class="cta" id="cta">
+            <p>Parabéns! Você concluiu todos os passos.</p>
+            <a href="04_desafio.html">➜ Seguir para o Desafio</a>
+        </div>
+
+        <div class="footer">🛠 Aula 5 · Projeto @karizeviecelli</div>
+    </div>
+
+    <script>
+        const steps = [
+            {
+                title: "Passo 1 - Imprima números de 1 a 10 com for",
+                instruction: "Use o laço for para exibir os números de 1 a 10 no console.",
+                dica: "<code>for (let i = 1; i <= 10; i++) { }</code>",
+                gabarito: "for (let i = 1; i <= 10; i++) {  \nconsole.log(i); \n}"
+            },
+            {
+                title: "Passo 2 - Escreva while que soma até 100",
+                instruction: "Use while para somar números de 1 até 100. Exiba o resultado final (que deve ser 5050).",
+                dica: "Acumule os valores em uma variável soma.",
+                gabarito: "let soma = 0; \nlet i = 1; \nwhile (i <= 100) { \n   soma += i; \n   i++; \n } \nconsole.log(soma);"
+            },
+            {
+                title: "Passo 3 - Use do...while para ler entrada",
+                instruction: "Simule um programa que pede uma senha e repete enquanto a senha estiver errada. Use do...while.",
+                dica: "<code>do { } while (senha !== \"1234\");</code>",
+                gabarito: "let senha; \ndo { \n senha = \"1234\"; \n} while (senha !== \"1234\"); \nconsole.log(\"Acesso liberado\");"
+            },
+            {
+                title: "Passo 4 - Pare um loop com break",
+                instruction: "Crie um for de 1 a 10 mas pare (break) quando chegar no 5. Exiba apenas 1, 2, 3, 4.",
+                dica: "<code>if (i === 5) break;</code>",
+                gabarito: "for (let i = 1; i <= 10; i++) { \n   if (i === 5) \n     break; \n   console.log(i);\n}"
+            },
+            {
+                title: "Passo 5 - Pule um número com continue",
+                instruction: "Crie um for de 1 a 5 que pule (continue) o número 3. Exiba: 1, 2, 4, 5.",
+                dica: "<code>if (i === 3) continue;</code>",
+                gabarito: "for (let i = 1; i <= 5; i++) { \n   if (i === 3) continue; \nconsole.log(i); \n}"
+            },
+            {
+                title: "Passo 6 - Crie uma tabuada com laço aninhado",
+                instruction: "Use dois for aninhados para criar a tabuada do 1 até o 3 (1x1 até 3x3).",
+                dica: "for externo = multiplicando, for interno = multiplicador.",
+                gabarito: "for (let i = 1; i <= 3; i++) { \n    for (let j = 1; j <= 3; j++) { \n       console.log(i + \" x \" + j + \" = \" + (i * j)); \n    } \n}"
+            }
+        ];
+
+        const cardsContainer = document.getElementById('cardsContainer');
+        const progressFill = document.getElementById('progressFill');
+        const cta = document.getElementById('cta');
+        const timerBtn = document.getElementById('timerBtn');
+        let timerRunning = false;
+        let seconds = 0;
+        let interval;
+
+        function renderCards() {
+            cardsContainer.innerHTML = '';
+            steps.forEach((step, index) => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.id = `card-${index}`;
+
+                const header = document.createElement('div');
+                header.className = 'card-header';
+                header.onclick = function(e) {
+                    if (e.target.tagName !== 'INPUT') {
+                        card.classList.toggle('open');
+                    }
+                };
+
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.id = `check-${index}`;
+                checkbox.onchange = updateProgress;
+
+                const label = document.createElement('label');
+                label.className = 'checkbox-label';
+                label.setAttribute('for', `check-${index}`);
+                label.textContent = step.title;
+
+                header.appendChild(checkbox);
+                header.appendChild(label);
+
+                const body = document.createElement('div');
+                body.className = 'card-body';
+
+                const instrP = document.createElement('p');
+                instrP.innerHTML = `<strong>Instrução:</strong> ${step.instruction}`;
+                body.appendChild(instrP);
+
+                const dicaP = document.createElement('p');
+                dicaP.innerHTML = `<strong>Dica:</strong> ${step.dica}`;
+                body.appendChild(dicaP);
+
+                const gabBtn = document.createElement('button');
+                gabBtn.className = 'gabarito-btn';
+                gabBtn.textContent = '📖 Gabarito';
+                gabBtn.onclick = function() {
+                    const codeDiv = document.getElementById(`gabarito-${index}`);
+                    codeDiv.classList.toggle('show');
+                };
+                body.appendChild(gabBtn);
+
+                const codeDiv = document.createElement('div');
+                codeDiv.className = 'gabarito-code';
+                codeDiv.id = `gabarito-${index}`;
+                codeDiv.textContent = step.gabarito;
+                body.appendChild(codeDiv);
+
+                card.appendChild(header);
+                card.appendChild(body);
+                cardsContainer.appendChild(card);
+            });
+        }
+
+        function updateProgress() {
+            const checkboxes = document.querySelectorAll('.card-body input[type="checkbox"]');
+            // Actually we need to get the checkboxes from headers
+            const chk = document.querySelectorAll('.card-header input[type="checkbox"]');
+            const total = chk.length;
+            let checked = 0;
+            chk.forEach(cb => {
+                if (cb.checked) checked++;
+            });
+            const percent = (checked / total) * 100;
+            progressFill.style.width = percent + '%';
+            if (checked === total) {
+                cta.classList.add('show');
+            } else {
+                cta.classList.remove('show');
+            }
+        }
+
+        function toggleTimer() {
+            if (timerRunning) {
+                clearInterval(interval);
+                timerBtn.textContent = '▶️';
+            } else {
+                interval = setInterval(() => {
+                    seconds++;
+                    // Could display timer somewhere but not required
+                }, 1000);
+                timerBtn.textContent = '⏸️';
+            }
+            timerRunning = !timerRunning;
+        }
+
+        timerBtn.addEventListener('click', toggleTimer);
+
+        renderCards();
+        updateProgress();
+    </script>
+</body>
+</html>

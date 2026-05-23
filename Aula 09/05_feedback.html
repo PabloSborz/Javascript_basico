@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aula 9 - Feedback</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Arial, sans-serif; }
+        body { background: #f0f4f8; min-height: 100vh; display: flex; flex-direction: column; }
+        .topbar { background: #0891b2; color: white; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
+        .topbar h1 { font-size: 1.5rem; }
+        .clock { font-size: 1rem; background: rgba(255,255,255,0.2); padding: 0.3rem 0.8rem; border-radius: 20px; }
+        .subtopo { background: white; padding: 0.8rem 2rem; border-bottom: 2px solid #e2e8f0; display: flex; align-items: center; gap: 2rem; }
+        .badge { background: #0891b2; color: white; padding: 0.3rem 1rem; border-radius: 20px; font-weight: bold; }
+        .painel-media { background: white; margin: 1rem 2rem; padding: 1.5rem; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); display: flex; align-items: center; gap: 1.5rem; }
+        .media-valor { font-size: 2.5rem; font-weight: bold; color: #0891b2; }
+        .progress-container { flex: 1; height: 20px; background: #e2e8f0; border-radius: 10px; overflow: hidden; }
+        .progress-bar { height: 100%; width: 0%; background: linear-gradient(90deg, #0891b2, #06b6d4); transition: width 0.3s; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem; padding: 0 2rem 2rem; }
+        .card { background: white; border-radius: 12px; padding: 1.5rem; box-shadow: 0 2px 8px rgba(0,0,0,0.1); display: flex; flex-direction: column; gap: 0.8rem; }
+        .card h3 { font-size: 1.2rem; color: #1e293b; }
+        .stars { display: flex; gap: 0.3rem; }
+        .star { font-size: 2rem; cursor: pointer; color: #d1d5db; transition: color 0.2s; }
+        .star.active { color: #f59e0b; }
+        .criterios { display: flex; flex-direction: column; gap: 0.3rem; }
+        .criterio { display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem; }
+        textarea { width: 100%; padding: 0.5rem; border: 1px solid #cbd5e1; border-radius: 6px; resize: vertical; }
+        .acoes { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+        .btn { padding: 0.5rem 1rem; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        .btn-apresentando { background: #f59e0b; color: white; }
+        .btn-concluido { background: #10b981; color: white; }
+        .btn-remover { background: #ef4444; color: white; }
+        .btn:hover { opacity: 0.85; transform: scale(0.98); }
+        .btn-adicionar { position: fixed; bottom: 2rem; right: 2rem; background: #0891b2; color: white; padding: 0.8rem 1.5rem; border-radius: 50px; font-size: 1.1rem; border: none; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.3); z-index: 10; }
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 100; }
+        .modal { background: white; padding: 2rem; border-radius: 12px; width: 90%; max-width: 400px; display: flex; flex-direction: column; gap: 1rem; }
+        .modal input { padding: 0.6rem; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 1rem; }
+        .modal .btn { align-self: flex-end; }
+        footer { background: #1e293b; color: white; text-align: center; padding: 1rem; margin-top: auto; }
+        footer a { color: #06b6d4; text-decoration: none; }
+    </style>
+</head>
+<body>
+    <div class="topbar">
+        <h1>📊 Painel de Apresentações — Aula 9</h1>
+        <div class="clock" id="clock"></div>
+    </div>
+    <div class="subtopo">
+        <span class="badge" id="alunosBadge">👥 0 Alunos</span>
+    </div>
+    <div class="painel-media">
+        <span class="media-valor" id="mediaValor">0.0</span>
+        <div class="progress-container">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+    </div>
+    <div class="grid" id="gridCards"></div>
+    <button class="btn-adicionar" id="btnAddAluno">+ Adicionar Aluno</button>
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal">
+            <h3>Adicionar Aluno</h3>
+            <input type="text" id="inputNomeAluno" placeholder="Nome do aluno">
+            <button class="btn btn-concluido" id="btnConfirmarAdd">Adicionar</button>
+            <button class="btn btn-remover" id="btnCancelarAdd">Cancelar</button>
+        </div>
+    </div>
+    <footer>
+        📊 Aula 9 · Projeto @karizeviecelli
+    </footer>
+    <script>
+        // localStorage key
+        const STORAGE_KEY = 'feedback_aula9';
+
+        // State
+        let alunos = [];
+
+        // Mock initial data
+        const mock = [
+            { nome: 'Ana', estrelas: 0, criterios: [false,false,false,false,false], observacao: '' },
+            { nome: 'Bruno', estrelas: 0, criterios: [false,false,false,false,false], observacao: '' }
+        ];
+
+        // Load or init
+        function loadData() {
+            const stored = localStorage.getItem(STORAGE_KEY);
+            if (stored) {
+                try { alunos = JSON.parse(stored); } catch(e) { alunos = []; }
+            } else {
+                alunos = mock;
+                saveData();
+            }
+        }
+
+        function saveData() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(alunos));
+        }
+
+        // Render all
+        function render() {
+            const grid = document.getElementById('gridCards');
+            grid.innerHTML = '';
+            alunos.forEach((aluno, idx) => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.dataset.index = idx;
+
+                // Name
+                const h3 = document.createElement('h3');
+                h3.textContent = aluno.nome;
+                card.appendChild(h3);
+
+                // Stars
+                const starsDiv = document.createElement('div');
+                starsDiv.className = 'stars';
+                for (let s = 1; s <= 5; s++) {
+                    const span = document.createElement('span');
+                    span.className = 'star' + (s <= aluno.estrelas ? ' active' : '');
+                    span.dataset.index = idx;
+                    span.dataset.star = s;
+                    span.textContent = '★';
+                    span.addEventListener('click', function(e) {
+                        const i = parseInt(this.dataset.index);
+                        const star = parseInt(this.dataset.star);
+                        alunos[i].estrelas = (alunos[i].estrelas === star) ? 0 : star;
+                        saveData();
+                        render();
+                    });
+                    starsDiv.appendChild(span);
+                }
+                card.appendChild(starsDiv);
+
+                // Criteria checkboxes
+                const criteriosDiv = document.createElement('div');
+                criteriosDiv.className = 'criterios';
+                const labels = [
+                    'Selecionou elementos do DOM corretamente',
+                    'Modificou conteúdo e estilo',
+                    'Respondeu a eventos',
+                    'Criou elementos dinamicamente',
+                    'Código executa sem erros'
+                ];
+                labels.forEach((label, ci) => {
+                    const div = document.createElement('div');
+                    div.className = 'criterio';
+                    const cb = document.createElement('input');
+                    cb.type = 'checkbox';
+                    cb.checked = aluno.criterios[ci] || false;
+                    cb.addEventListener('change', function() {
+                        alunos[idx].criterios[ci] = this.checked;
+                        saveData();
+                        render();
+                    });
+                    const lbl = document.createElement('span');
+                    lbl.textContent = label;
+                    div.appendChild(cb);
+                    div.appendChild(lbl);
+                    criteriosDiv.appendChild(div);
+                });
+                card.appendChild(criteriosDiv);
+
+                // Textarea
+                const ta = document.createElement('textarea');
+                ta.rows = 3;
+                ta.placeholder = 'Observação...';
+                ta.value = aluno.observacao || '';
+                ta.addEventListener('input', function() {
+                    alunos[idx].observacao = this.value;
+                    saveData();
+                });
+                card.appendChild(ta);
+
+                // Buttons
+                const acoesDiv = document.createElement('div');
+                acoesDiv.className = 'acoes';
+
+                const btnApres = document.createElement('button');
+                btnApres.className = 'btn btn-apresentando';
+                btnApres.textContent = 'Apresentando';
+                btnApres.addEventListener('click', function() {
+                    alert(`Aluno ${alunos[idx].nome} está apresentando.`);
+                });
+                acoesDiv.appendChild(btnApres);
+
+                const btnConc = document.createElement('button');
+                btnConc.className = 'btn btn-concluido';
+                btnConc.textContent = 'Concluído';
+                btnConc.addEventListener('click', function() {
+                    if (confirm(`Concluir apresentação de ${alunos[idx].nome}?`)) {
+                        // Optionally do something
+                    }
+                });
+                acoesDiv.appendChild(btnConc);
+
+                const btnRem = document.createElement('button');
+                btnRem.className = 'btn btn-remover';
+                btnRem.textContent = 'Remover';
+                btnRem.addEventListener('click', function() {
+                    if (confirm(`Remover aluno ${alunos[idx].nome}?`)) {
+                        alunos.splice(idx, 1);
+                        saveData();
+                        render();
+                    }
+                });
+                acoesDiv.appendChild(btnRem);
+
+                card.appendChild(acoesDiv);
+                grid.appendChild(card);
+            });
+
+            // Update badge
+            document.getElementById('alunosBadge').textContent = `👥 ${alunos.length} Alunos`;
+
+            // Update media
+            updateMedia();
+        }
+
+        function updateMedia() {
+            if (alunos.length === 0) {
+                document.getElementById('mediaValor').textContent = '0.0';
+                document.getElementById('progressBar').style.width = '0%';
+                return;
+            }
+            let soma = 0;
+            alunos.forEach(a => soma += a.estrelas);
+            const media = soma / alunos.length;
+            document.getElementById('mediaValor').textContent = media.toFixed(1);
+            const percent = (media / 5) * 100;
+            document.getElementById('progressBar').style.width = percent + '%';
+        }
+
+        // Clock
+        function updateClock() {
+            const now = new Date();
+            const time = now.toLocaleTimeString('pt-BR');
+            document.getElementById('clock').textContent = time;
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        // Modal
+        const modalOverlay = document.getElementById('modalOverlay');
+        document.getElementById('btnAddAluno').addEventListener('click', function() {
+            modalOverlay.style.display = 'flex';
+            document.getElementById('inputNomeAluno').value = '';
+            document.getElementById('inputNomeAluno').focus();
+        });
+        document.getElementById('btnCancelarAdd').addEventListener('click', function() {
+            modalOverlay.style.display = 'none';
+        });
+        document.getElementById('btnConfirmarAdd').addEventListener('click', function() {
+            const nome = document.getElementById('inputNomeAluno').value.trim();
+            if (nome === '') {
+                alert('Digite um nome válido.');
+                return;
+            }
+            alunos.push({ nome: nome, estrelas: 0, criterios: [false,false,false,false,false], observacao: '' });
+            saveData();
+            modalOverlay.style.display = 'none';
+            render();
+        });
+        // Close modal on overlay click
+        modalOverlay.addEventListener('click', function(e) {
+            if (e.target === this) {
+                this.style.display = 'none';
+            }
+        });
+
+        // Init
+        loadData();
+        render();
+    </script>
+</body>
+</html>

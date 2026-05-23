@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aula 6 - Arrays</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, -apple-system, sans-serif;
+        }
+        body {
+            background: #f8fafc;
+            color: #1e293b;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        .topbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: #f8fafc;
+            padding: 12px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #e2e8f0;
+            z-index: 10;
+        }
+        .topbar h1 {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+        .timer {
+            font-size: 0.9rem;
+            color: #64748b;
+        }
+        .slides-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding-top: 80px;
+            padding-bottom: 40px;
+            position: relative;
+            overflow: hidden;
+        }
+        .slides-wrapper {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            min-height: 400px;
+        }
+        .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            padding: 40px;
+            opacity: 0;
+            transform: translateX(50px);
+            transition: opacity 0.4s ease, transform 0.4s ease;
+            pointer-events: none;
+        }
+        .slide.active {
+            opacity: 1;
+            transform: translateX(0);
+            pointer-events: auto;
+            position: relative;
+        }
+        .slide h2 {
+            font-size: 1.5rem;
+            margin-bottom: 16px;
+            color: #0891b2;
+        }
+        .slide p {
+            font-size: 1rem;
+            line-height: 1.6;
+            margin-bottom: 12px;
+        }
+        .code-block {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 16px;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 0.9rem;
+            white-space: pre-wrap;
+            word-break: break-word;
+            margin-bottom: 16px;
+        }
+        .highlight-box {
+            background: #e0f2fe;
+            padding: 16px;
+            border-radius: 8px;
+            border-left: 4px solid #0891b2;
+            margin-bottom: 16px;
+        }
+        .cta-btn {
+            display: inline-block;
+            background: #0891b2;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+        .cta-btn:hover {
+            background: #0e7490;
+        }
+        .navigation {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 16px;
+            margin-top: 24px;
+        }
+        .nav-btn {
+            background: none;
+            border: 2px solid #cbd5e1;
+            border-radius: 50%;
+            width: 48px;
+            height: 48px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: border-color 0.2s;
+        }
+        .nav-btn:hover {
+            border-color: #0891b2;
+        }
+        .dots {
+            display: flex;
+            gap: 8px;
+        }
+        .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #cbd5e1;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .dot.active {
+            background: #0891b2;
+        }
+        footer {
+            text-align: center;
+            padding: 20px;
+            color: #64748b;
+            font-size: 0.9rem;
+            border-top: 1px solid #e2e8f0;
+        }
+    </style>
+</head>
+<body>
+    <div class="topbar">
+        <h1>Aula 6 - Arrays</h1>
+        <div class="timer" id="timer">00:00</div>
+    </div>
+    <div class="slides-container">
+        <div class="slides-wrapper">
+            <div class="slide active" data-index="0">
+                <h2>O que são Arrays?</h2>
+                <p>Array é uma lista ordenada que armazena múltiplos valores em uma única variável. Cada item ocupa uma posição (índice) começando em 0.</p>
+                <div class="code-block">let frutas = ["maçã", "banana", "uva"];
+console.log(frutas[0]); // maçã</div>
+            </div>
+            <div class="slide" data-index="1">
+                <h2>Índices e length</h2>
+                <p>Cada elemento tem um índice numérico. O primeiro é 0, o último é length - 1. length retorna o tamanho do array.</p>
+                <div class="code-block">let numeros = [10, 20, 30];
+console.log(numeros.length); // 3
+console.log(numeros[numeros.length - 1]); // 30</div>
+            </div>
+            <div class="slide" data-index="2">
+                <h2>Métodos push, pop, shift, unshift</h2>
+                <p>push() adiciona no final, pop() remove do final, shift() remove do início, unshift() adiciona no início.</p>
+                <div class="code-block">let cores = ["azul"];
+cores.push("verde"); // ["azul", "verde"]
+cores.pop(); // ["azul"]</div>
+            </div>
+            <div class="slide" data-index="3">
+                <h2>Métodos slice, splice, concat</h2>
+                <p>slice() copia parte do array sem modificar original, splice() adiciona/remove em qualquer posição, concat() junta arrays.</p>
+                <div class="code-block">let a = [1,2,3];
+let b = [4,5];
+let c = a.concat(b); // [1,2,3,4,5]</div>
+            </div>
+            <div class="slide" data-index="4">
+                <h2>Iteração com forEach</h2>
+                <p>forEach() executa uma função para cada elemento do array. É a forma mais elegante de percorrer listas.</p>
+                <div class="code-block">let numeros = [1, 2, 3];
+numeros.forEach(function(n) {
+    console.log(n * 2);
+}); // 2, 4, 6</div>
+            </div>
+            <div class="slide" data-index="5">
+                <h2>Métodos map, filter, reduce</h2>
+                <p>map() transforma cada elemento, filter() seleciona elementos que atendem condição, reduce() reduz array a um único valor.</p>
+                <div class="code-block">let nums = [1,2,3,4];
+let pares = nums.filter(n => n % 2 === 0); // [2,4]</div>
+            </div>
+            <div class="slide" data-index="6">
+                <h2>Busca com indexOf e includes</h2>
+                <p>indexOf() retorna o índice do elemento ou -1 se não existir. includes() retorna true/false se o elemento existe.</p>
+                <div class="code-block">let frutas = ["maçã", "banana"];
+console.log(frutas.includes("maçã")); // true</div>
+            </div>
+            <div class="slide" data-index="7">
+                <h2>Arrays Multidimensionais</h2>
+                <p>Array dentro de array - como uma planilha com linhas e colunas. Útil para matrizes e tabelas.</p>
+                <div class="code-block">let matriz = [[1,2], [3,4]];
+console.log(matriz[0][1]); // 2</div>
+                <div style="margin-top:24px;">
+                    <a href="02_demo.html" class="cta-btn">➜ Seguir para a Demonstração</a>
+                </div>
+            </div>
+        </div>
+        <div class="navigation">
+            <button class="nav-btn" id="prevBtn">◀</button>
+            <div class="dots" id="dots"></div>
+            <button class="nav-btn" id="nextBtn">▶</button>
+        </div>
+    </div>
+    <footer>📖 Aula 6 · Projeto @karizeviecelli</footer>
+    <script>
+        (function() {
+            const slides = document.querySelectorAll('.slide');
+            const dotsContainer = document.getElementById('dots');
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            let currentIndex = 0;
+            let timerInterval = null;
+            let seconds = 0;
+            const timerEl = document.getElementById('timer');
+
+            // Create dots
+            slides.forEach((_, i) => {
+                const dot = document.createElement('div');
+                dot.classList.add('dot');
+                if (i === 0) dot.classList.add('active');
+                dot.addEventListener('click', () => goToSlide(i));
+                dotsContainer.appendChild(dot);
+            });
+
+            function goToSlide(index) {
+                if (index < 0 || index >= slides.length) return;
+                slides.forEach((slide, i) => {
+                    slide.classList.toggle('active', i === index);
+                });
+                document.querySelectorAll('.dot').forEach((dot, i) => {
+                    dot.classList.toggle('active', i === index);
+                });
+                currentIndex = index;
+            }
+
+            function nextSlide() {
+                if (currentIndex < slides.length - 1) {
+                    goToSlide(currentIndex + 1);
+                }
+            }
+
+            function prevSlide() {
+                if (currentIndex > 0) {
+                    goToSlide(currentIndex - 1);
+                }
+            }
+
+            prevBtn.addEventListener('click', prevSlide);
+            nextBtn.addEventListener('click', nextSlide);
+
+            // Keyboard navigation
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'ArrowRight') nextSlide();
+                if (e.key === 'ArrowLeft') prevSlide();
+            });
+
+            // Timer
+            function updateTimer() {
+                seconds++;
+                const mins = String(Math.floor(seconds / 60)).padStart(2, '0');
+                const secs = String(seconds % 60).padStart(2, '0');
+                timerEl.textContent = `${mins}:${secs}`;
+            }
+            timerInterval = setInterval(updateTimer, 1000);
+        })();
+    </script>
+</body>
+</html>

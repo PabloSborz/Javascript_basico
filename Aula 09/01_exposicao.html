@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aula 9 - Manipulação do DOM</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: system-ui, sans-serif; }
+    body { background: #f8fafc; color: #1e293b; display: flex; flex-direction: column; min-height: 100vh; }
+    .topbar { position: fixed; top: 0; left: 0; width: 100%; background: white; border-bottom: 1px solid #e2e8f0; padding: 12px 24px; display: flex; justify-content: space-between; align-items: center; z-index: 100; }
+    .topbar h1 { font-size: 1.2rem; color: #0891b2; }
+    .topbar .timer { font-size: 0.9rem; color: #64748b; }
+    .slides-container { flex: 1; display: flex; align-items: center; justify-content: center; padding: 80px 24px 60px; position: relative; }
+    .slide { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; max-width: 800px; text-align: center; opacity: 0; transition: opacity 0.5s ease; position: absolute; }
+    .slide.active { opacity: 1; position: relative; }
+    .slide h2 { font-size: 2rem; margin-bottom: 16px; color: #0891b2; }
+    .slide p { font-size: 1.1rem; line-height: 1.6; margin-bottom: 12px; }
+    .code-block { background: #1e293b; color: #e2e8f0; padding: 16px; border-radius: 8px; text-align: left; font-family: 'Courier New', monospace; font-size: 0.9rem; width: 100%; overflow-x: auto; margin: 16px 0; }
+    .code-block code { white-space: pre; }
+    .highlight-box { background: #e0f2fe; padding: 16px; border-radius: 8px; border-left: 4px solid #0891b2; margin: 16px 0; width: 100%; }
+    .navigation { display: flex; align-items: center; justify-content: center; gap: 16px; margin-top: 24px; }
+    .nav-btn { background: none; border: none; font-size: 2rem; cursor: pointer; color: #0891b2; transition: transform 0.2s; }
+    .nav-btn:hover { transform: scale(1.2); }
+    .dots { display: flex; gap: 8px; }
+    .dot { width: 12px; height: 12px; border-radius: 50%; background: #cbd5e1; cursor: pointer; transition: background 0.3s; }
+    .dot.active { background: #0891b2; }
+    footer { background: white; border-top: 1px solid #e2e8f0; padding: 16px 24px; text-align: center; color: #64748b; font-size: 0.9rem; }
+    .cta-btn { display: inline-block; background: #0891b2; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold; margin-top: 20px; transition: background 0.3s; }
+    .cta-btn:hover { background: #0e7490; }
+    @media (max-width: 600px) {
+      .slide h2 { font-size: 1.5rem; }
+      .slide p { font-size: 1rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <h1>Aula 9 - Manipulação do DOM</h1>
+    <span class="timer" id="timer">00:00</span>
+  </div>
+  <div class="slides-container">
+    <!-- Slide 1 -->
+    <div class="slide active" data-slide="0">
+      <h2>O que é o DOM?</h2>
+      <p>DOM (Document Object Model) é a representação da página HTML como uma árvore de objetos. Cada tag é um nó que pode ser acessado e modificado pelo JavaScript. O DOM transforma o HTML em uma estrutura que o JS entende.</p>
+    </div>
+    <!-- Slide 2 -->
+    <div class="slide" data-slide="1">
+      <h2>Selecionar elementos: getElementById, querySelector</h2>
+      <p><code>getElementById('id')</code> seleciona um elemento pelo ID. <code>querySelector('.classe')</code> seleciona o primeiro elemento que corresponde ao seletor CSS.</p>
+      <div class="code-block"><code>let titulo = document.getElementById('titulo');
+let paragrafo = document.querySelector('p');</code></div>
+    </div>
+    <!-- Slide 3 -->
+    <div class="slide" data-slide="2">
+      <h2>Modificar conteúdo: textContent, innerHTML</h2>
+      <p><code>textContent</code> altera apenas o texto. <code>innerHTML</code> altera o HTML interno (pode incluir tags).</p>
+      <div class="code-block"><code>elemento.textContent = "Novo texto";
+elemento.innerHTML = "&lt;strong&gt;Negrito&lt;/strong&gt;";</code></div>
+    </div>
+    <!-- Slide 4 -->
+    <div class="slide" data-slide="3">
+      <h2>Modificar atributos e classes</h2>
+      <p><code>setAttribute()</code> altera atributos. <code>classList.add()</code> e <code>classList.remove()</code> manipulam classes CSS. <code>classList.toggle()</code> alterna uma classe.</p>
+      <div class="code-block"><code>elemento.classList.add('destaque');
+elemento.setAttribute('src', 'imagem.jpg');</code></div>
+    </div>
+    <!-- Slide 5 -->
+    <div class="slide" data-slide="4">
+      <h2>Criar e remover elementos</h2>
+      <p><code>createElement()</code> cria novo elemento, <code>appendChild()</code> adiciona ao DOM, <code>remove()</code> ou <code>removeChild()</code> remove.</p>
+      <div class="code-block"><code>let novoP = document.createElement('p');
+novoP.textContent = "Olá";
+document.body.appendChild(novoP);</code></div>
+    </div>
+    <!-- Slide 6 -->
+    <div class="slide" data-slide="5">
+      <h2>Eventos: click, mouseover, keydown</h2>
+      <p>Eventos são ações que disparam funções. <code>addEventListener()</code> escuta eventos. click (clique), mouseover (passar mouse), keydown (tecla pressionada).</p>
+      <div class="code-block"><code>botao.addEventListener('click', function() {
+  alert('Clicou!');
+});</code></div>
+    </div>
+    <!-- Slide 7 -->
+    <div class="slide" data-slide="6">
+      <h2>Evento load e DOMContentLoaded</h2>
+      <p><code>DOMContentLoaded</code> dispara quando o HTML foi carregado (antes de imagens). <code>load</code> espera tudo carregar (imagens, CSS).</p>
+      <div class="code-block"><code>document.addEventListener('DOMContentLoaded', function() {
+  console.log('Pronto!');
+});</code></div>
+    </div>
+    <!-- Slide 8 -->
+    <div class="slide" data-slide="7">
+      <h2>Delegação de eventos</h2>
+      <p>Em vez de adicionar evento a cada elemento, adicionamos ao pai e usamos <code>target</code> para identificar qual filho foi clicado. Essencial para listas dinâmicas.</p>
+      <div class="code-block"><code>lista.addEventListener('click', function(e) {
+  if (e.target.tagName === 'LI') {
+    console.log(e.target.textContent);
+  }
+});</code></div>
+      <a href="02_demo.html" class="cta-btn">➜ Seguir para a Demonstração</a>
+    </div>
+  </div>
+  <div class="navigation">
+    <button class="nav-btn" id="prevBtn">◀</button>
+    <div class="dots" id="dotsContainer"></div>
+    <button class="nav-btn" id="nextBtn">▶</button>
+  </div>
+  <footer>
+    📖 Aula 9 · Projeto @karizeviecelli
+  </footer>
+  <script>
+    (function() {
+      const slides = document.querySelectorAll('.slide');
+      const totalSlides = slides.length;
+      let currentSlide = 0;
+      const prevBtn = document.getElementById('prevBtn');
+      const nextBtn = document.getElementById('nextBtn');
+      const dotsContainer = document.getElementById('dotsContainer');
+      const timerEl = document.getElementById('timer');
+      let seconds = 0;
+      let timerInterval;
+
+      // Create dots
+      for (let i = 0; i < totalSlides; i++) {
+        const dot = document.createElement('span');
+        dot.classList.add('dot');
+        if (i === 0) dot.classList.add('active');
+        dot.dataset.index = i;
+        dot.addEventListener('click', function() {
+          showSlide(parseInt(this.dataset.index));
+        });
+        dotsContainer.appendChild(dot);
+      }
+
+      function showSlide(index) {
+        slides.forEach(slide => slide.classList.remove('active'));
+        document.querySelectorAll('.dot').forEach(dot => dot.classList.remove('active'));
+        slides[index].classList.add('active');
+        dotsContainer.children[index].classList.add('active');
+        currentSlide = index;
+      }
+
+      function nextSlide() {
+        if (currentSlide < totalSlides - 1) {
+          showSlide(currentSlide + 1);
+        }
+      }
+
+      function prevSlide() {
+        if (currentSlide > 0) {
+          showSlide(currentSlide - 1);
+        }
+      }
+
+      prevBtn.addEventListener('click', prevSlide);
+      nextBtn.addEventListener('click', nextSlide);
+
+      // Keyboard navigation
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'ArrowRight' || e.key === ' ') {
+          e.preventDefault();
+          nextSlide();
+        } else if (e.key === 'ArrowLeft') {
+          e.preventDefault();
+          prevSlide();
+        }
+      });
+
+      // Timer
+      function updateTimer() {
+        seconds++;
+        const mins = Math.floor(seconds / 60);
+        const secs = seconds % 60;
+        timerEl.textContent = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+      }
+      timerInterval = setInterval(updateTimer, 1000);
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aula 4 - Estruturas de Decisão</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Segoe UI', sans-serif; background: #f8fafc; color: #1e293b; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding-top: 70px; padding-bottom: 60px; }
+    .topbar { position: fixed; top: 0; left: 0; right: 0; height: 60px; background: #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: space-between; padding: 0 20px; z-index: 100; }
+    .topbar h1 { font-size: 1.2rem; color: #1e293b; }
+    .timer { font-size: 1rem; color: #0891b2; font-weight: bold; }
+    .slides-container { position: relative; width: 90%; max-width: 800px; margin: 20px auto; overflow: hidden; }
+    .slide { display: none; opacity: 0; transition: opacity 0.5s ease; padding: 20px; background: white; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+    .slide.active { display: block; opacity: 1; }
+    .slide h2 { color: #0891b2; margin-bottom: 15px; font-size: 1.5rem; }
+    .slide p { margin-bottom: 10px; line-height: 1.6; }
+    .code-block { background: #1e293b; color: #e2e8f0; padding: 15px; border-radius: 8px; font-family: 'Courier New', monospace; font-size: 0.9rem; overflow-x: auto; margin: 10px 0; }
+    .highlight-box { background: #e0f2fe; border-left: 4px solid #0891b2; padding: 10px 15px; margin: 10px 0; border-radius: 0 8px 8px 0; }
+    .cta-btn { display: inline-block; background: #0891b2; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold; margin-top: 15px; transition: background 0.3s; }
+    .cta-btn:hover { background: #067a98; }
+    .nav { text-align: center; margin-top: 20px; }
+    .nav button { background: none; border: none; font-size: 2rem; cursor: pointer; color: #0891b2; margin: 0 10px; transition: color 0.3s; }
+    .nav button:hover { color: #067a98; }
+    .dots { display: flex; justify-content: center; gap: 8px; margin-top: 10px; }
+    .dot { width: 12px; height: 12px; border-radius: 50%; background: #cbd5e1; cursor: pointer; transition: background 0.3s; }
+    .dot.active { background: #0891b2; }
+    footer { position: fixed; bottom: 0; left: 0; right: 0; background: #fff; text-align: center; padding: 10px; font-size: 0.9rem; color: #64748b; border-top: 1px solid #e2e8f0; }
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <h1>Aula 4 - Estruturas de Decisão</h1>
+    <div class="timer" id="timer">00:00:00</div>
+  </div>
+
+  <div class="slides-container">
+    <div class="slide active">
+      <h2>Estrutura if/else</h2>
+      <p>if/else é a estrutura mais básica de decisão em programação. if verifica uma condição e executa um bloco se for verdadeira. else executa outro bloco se for falsa.</p>
+      <div class="code-block"><code>let idade = 16;
+if (idade >= 18) {
+  console.log("Maior");
+} else {
+  console.log("Menor");
+}</code></div>
+    </div>
+    <div class="slide">
+      <h2>Múltiplos else if</h2>
+      <p>Podemos encadear várias condições com else if. O programa verifica cada condição em ordem e executa apenas a primeira que for verdadeira.</p>
+      <div class="code-block"><code>let nota = 85;
+if (nota >= 90) {
+  console.log("A");
+} else if (nota >= 80) {
+  console.log("B");
+} else {
+  console.log("C");
+}</code></div>
+    </div>
+    <div class="slide">
+      <h2>Switch case</h2>
+      <p>Switch é ideal para comparar uma variável contra vários valores específicos. case define cada valor possível, break interrompe a execução, default é o caso padrão.</p>
+      <div class="code-block"><code>let dia = 3;
+switch(dia) {
+  case 1:
+    console.log("Segunda");
+    break;
+  case 2:
+    console.log("Terça");
+    break;
+  default:
+    console.log("Outro");
+}</code></div>
+    </div>
+    <div class="slide">
+      <h2>Operador Ternário para decisões simples</h2>
+      <p>O ternário é uma forma compacta de if/else em uma única linha: condicao ? valorSeVerdadeiro : valorSeFalso. Use para decisões simples, não para lógicas complexas.</p>
+      <div class="code-block"><code>let resultado = idade >= 18 ? "Adulto" : "Menor";</code></div>
+    </div>
+    <div class="slide">
+      <h2>Aninhamento de estruturas</h2>
+      <p>Podemos colocar um if dentro de outro if. Isso é chamado de aninhamento. Cuidado: muitos níveis deixam o código difícil de ler.</p>
+      <div class="code-block"><code>if (logado) {
+  if (admin) {
+    console.log("Painel admin");
+  }
+}</code></div>
+    </div>
+    <div class="slide">
+      <h2>Condições com lógicos combinados</h2>
+      <p>Use &&, || e ! para criar condições mais poderosas. && exige que todas sejam verdadeiras. || aceita qualquer uma. ! inverte o resultado.</p>
+      <div class="code-block"><code>if (idade >= 18 && temIngresso) {
+  console.log("Pode entrar");
+}</code></div>
+    </div>
+    <div class="slide">
+      <h2>Truthy e falsy</h2>
+      <p>Em JavaScript, valores podem ser verdadeiros ou falsos em contexto booleano. São falsy: false, 0, "" (string vazia), null, undefined, NaN. Todo o resto é truthy.</p>
+      <div class="code-block"><code>if ("texto") {
+  console.log("É truthy!");
+}
+if (0) {
+  console.log("Não executa");
+}</code></div>
+    </div>
+    <div class="slide">
+      <h2>Boas práticas em decisões</h2>
+      <p>Mantenha if/else simples e legíveis. Evite aninhamentos profundos (max 2 níveis). Prefira switch para múltiplos casos fixos. Use ternário apenas para decisões simples de uma linha. Sempre use === em vez de ==. Teste todas as condições possíveis.</p>
+      <a href="02_demo.html" class="cta-btn">➜ Seguir para a Demonstração</a>
+    </div>
+  </div>
+
+  <div class="nav">
+    <button id="prevBtn">&#9664;</button>
+    <button id="nextBtn">&#9654;</button>
+  </div>
+  <div class="dots" id="dots"></div>
+
+  <footer>📖 Aula 4 · Projeto @karizeviecelli</footer>
+
+  <script>
+    (function() {
+      const slides = document.querySelectorAll('.slide');
+      const dotsContainer = document.getElementById('dots');
+      let currentSlide = 0;
+
+      // Create dots
+      slides.forEach((_, i) => {
+        const dot = document.createElement('div');
+        dot.classList.add('dot');
+        if (i === 0) dot.classList.add('active');
+        dot.addEventListener('click', () => goToSlide(i));
+        dotsContainer.appendChild(dot);
+      });
+
+      function goToSlide(index) {
+        if (index < 0 || index >= slides.length) return;
+        slides[currentSlide].classList.remove('active');
+        document.querySelectorAll('.dot')[currentSlide].classList.remove('active');
+        currentSlide = index;
+        slides[currentSlide].classList.add('active');
+        document.querySelectorAll('.dot')[currentSlide].classList.add('active');
+      }
+
+      document.getElementById('prevBtn').addEventListener('click', () => {
+        goToSlide(currentSlide - 1);
+      });
+      document.getElementById('nextBtn').addEventListener('click', () => {
+        goToSlide(currentSlide + 1);
+      });
+
+      // Timer
+      let seconds = 0;
+      const timerEl = document.getElementById('timer');
+      function updateTimer() {
+        seconds++;
+        const h = Math.floor(seconds / 3600);
+        const m = Math.floor((seconds % 3600) / 60);
+        const s = seconds % 60;
+        timerEl.textContent = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+      }
+      setInterval(updateTimer, 1000);
+    })();
+  </script>
+</body>
+</html>

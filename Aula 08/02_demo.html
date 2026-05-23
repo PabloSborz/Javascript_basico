@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aula 8 - Funções</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Consolas', 'Courier New', monospace; }
+    body { background: #f8fafc; min-height: 100vh; display: flex; flex-direction: column; }
+    #topbar { position: fixed; top: 0; left: 0; width: 100%; height: 50px; background: #0f172a; color: #e2e8f0; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; z-index: 1000; }
+    #topbar .title { font-size: 16px; font-weight: 600; }
+    #timer { font-size: 14px; background: #1e293b; padding: 4px 12px; border-radius: 4px; }
+    #controls { position: fixed; top: 50px; left: 0; width: 100%; height: 44px; background: #1e293b; display: flex; align-items: center; gap: 8px; padding: 0 20px; z-index: 999; border-bottom: 1px solid #334155; }
+    #controls button { background: #334155; color: #e2e8f0; border: none; padding: 6px 14px; border-radius: 4px; cursor: pointer; font-size: 13px; transition: 0.2s; }
+    #controls button:hover { background: #475569; }
+    #container { display: flex; margin-top: 94px; flex: 1; min-height: calc(100vh - 94px - 50px); }
+    #editor { width: 50%; background: #1e293b; color: #e2e8f0; padding: 20px; overflow: auto; white-space: pre-wrap; font-size: 14px; line-height: 1.6; }
+    #editor .k { color: #c084fc; } /* keyword */
+    #editor .v { color: #fbbf24; } /* number */
+    #output { width: 50%; background: #ecfeff; color: #0f172a; padding: 20px; overflow: auto; font-size: 14px; line-height: 1.6; }
+    #output .line { display: block; }
+    #output .prompt { color: #64748b; }
+    #output .result { color: #16a34a; }
+    #footer { position: relative; height: 50px; background: #0f172a; color: #94a3b8; display: flex; align-items: center; justify-content: center; gap: 12px; font-size: 13px; }
+    #footer a { color: #60a5fa; text-decoration: none; font-weight: 600; }
+    #footer a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <div id="topbar">
+    <span class="title">💻 Aula 8 · Demonstração</span>
+    <span id="timer">⏱ 0.0s</span>
+  </div>
+  <div id="controls">
+    <button id="btnExecutar">▶ Executar</button>
+    <button id="btnReset">⏹ Reset</button>
+    <button id="btnRapido">⚡ Rápido</button>
+  </div>
+  <div id="container">
+    <div id="editor">
+      <span class="k">function</span> <span class="k">dobro</span>(x) {
+      <span class="k">  return</span> x * <span class="v">2</span>;
+      }
+      <span class="k">console</span>.log(<span class="k">dobro</span>(<span class="v">7</span>));
+      <span class="k">console</span>.log(<span class="k">dobro</span>(<span class="v">3</span>));
+    </div>
+    <div id="output"></div>
+  </div>
+  <div id="footer">
+    <span>💻 Aula 8 · Projeto @karizeviecelli</span>
+    <a href="03_pratica.html">➜ Seguir para a Prática</a>
+  </div>
+  <script>
+    (function() {
+      var output = document.getElementById('output');
+      var timerSpan = document.getElementById('timer');
+      var btnExecutar = document.getElementById('btnExecutar');
+      var btnReset = document.getElementById('btnReset');
+      var btnRapido = document.getElementById('btnRapido');
+      var timerInterval = null;
+      var time = 0;
+      var running = false;
+
+      function updateTimer() {
+        timerSpan.textContent = '⏱ ' + time.toFixed(1) + 's';
+      }
+
+      function startTimer() {
+        if (timerInterval) clearInterval(timerInterval);
+        time = 0;
+        updateTimer();
+        timerInterval = setInterval(function() {
+          time += 0.1;
+          updateTimer();
+        }, 100);
+      }
+
+      function stopTimer() {
+        if (timerInterval) {
+          clearInterval(timerInterval);
+          timerInterval = null;
+        }
+      }
+
+      function resetTimer() {
+        stopTimer();
+        time = 0;
+        updateTimer();
+      }
+
+      function resetOutput() {
+        output.innerHTML = '';
+        stopTimer();
+        resetTimer();
+        running = false;
+      }
+
+      function typewriter(lines, index, delay) {
+        if (index >= lines.length) {
+          running = false;
+          return;
+        }
+        var line = lines[index];
+        var charIndex = 0;
+        var lineDiv = document.createElement('span');
+        lineDiv.className = 'line';
+        output.appendChild(lineDiv);
+        var promptSpan = document.createElement('span');
+        promptSpan.className = 'prompt';
+        promptSpan.textContent = '> ';
+        lineDiv.appendChild(promptSpan);
+        var resultSpan = document.createElement('span');
+        resultSpan.className = 'result';
+        lineDiv.appendChild(resultSpan);
+
+        function typeChar() {
+          if (charIndex < line.length) {
+            resultSpan.textContent += line[charIndex];
+            charIndex++;
+            setTimeout(typeChar, delay);
+          } else {
+            setTimeout(function() {
+              typewriter(lines, index + 1, delay);
+            }, delay * 2);
+          }
+        }
+        typeChar();
+      }
+
+      function executar() {
+        if (running) return;
+        running = true;
+        resetOutput();
+        startTimer();
+        var lines = [
+          '14',
+          '6'
+        ];
+        var delay = 100;
+        if (btnRapido.classList.contains('active')) {
+          delay = 20;
+        }
+        typewriter(lines, 0, delay);
+      }
+
+      btnExecutar.addEventListener('click', executar);
+      btnReset.addEventListener('click', function() {
+        resetOutput();
+        running = false;
+      });
+
+      btnRapido.addEventListener('click', function() {
+        this.classList.toggle('active');
+        if (this.classList.contains('active')) {
+          this.style.background = '#475569';
+        } else {
+          this.style.background = '';
+        }
+      });
+
+      // Ensure no default behavior on footer link
+      document.querySelector('#footer a').addEventListener('click', function(e) {
+        // allow default navigation
+      });
+    })();
+  </script>
+</body>
+</html>

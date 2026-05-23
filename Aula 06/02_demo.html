@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aula 6 - Arrays</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Courier New', monospace; overflow: hidden; height: 100vh; background: #0f172a; color: #e2e8f0; }
+.topbar { position: fixed; top: 0; left: 0; width: 100%; height: 50px; background: #1e293b; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; border-bottom: 2px solid #334155; z-index: 10; }
+.topbar .title { font-weight: bold; font-size: 18px; }
+.topbar .cronometro { font-size: 16px; background: #0f172a; padding: 4px 12px; border-radius: 6px; }
+.controls { position: fixed; top: 50px; left: 0; width: 100%; height: 44px; background: #1e293b; display: flex; align-items: center; gap: 16px; padding: 0 20px; border-bottom: 1px solid #334155; z-index: 10; }
+.controls button { background: #0f172a; color: #e2e8f0; border: 1px solid #475569; padding: 6px 16px; border-radius: 6px; cursor: pointer; font-size: 14px; font-family: inherit; transition: 0.2s; }
+.controls button:hover { background: #334155; }
+.container { display: flex; margin-top: 94px; height: calc(100vh - 94px - 80px); /* 80px footer approx */ overflow: hidden; }
+.editor { width: 50%; background: #1e293b; padding: 20px; overflow: auto; font-size: 16px; line-height: 1.8; border-right: 2px solid #334155; }
+.output { width: 50%; background: #ecfeff; color: #0f172a; padding: 20px; overflow: auto; font-size: 16px; line-height: 1.8; }
+.code-line { display: block; white-space: pre; }
+.code-line .k { color: #c084fc; font-weight: bold; }
+.code-line .s { color: #fbbf24; }
+.code-line .v { color: #34d399; }
+.cursor { display: inline-block; width: 2px; height: 1.2em; background: #e2e8f0; animation: blink 1s step-end infinite; vertical-align: text-bottom; }
+@keyframes blink { 50% { opacity: 0; } }
+.highlight { background: #334155; border-radius: 4px; transition: background 0.3s; }
+.footer { position: relative; height: 80px; background: #1e293b; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; border-top: 2px solid #334155; }
+.footer .credits { font-size: 14px; }
+.footer a { background: #3b82f6; color: #fff; text-decoration: none; padding: 8px 24px; border-radius: 8px; font-weight: bold; transition: 0.2s; }
+.footer a:hover { background: #2563eb; }
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="title">Aula 6 - Arrays</div>
+  <div class="cronometro" id="cronometro">00:00</div>
+</div>
+<div class="controls">
+  <button id="executar">▶ Executar</button>
+  <button id="reset">⏹ Reset</button>
+  <button id="rapido">⚡ Rápido</button>
+</div>
+<div class="container">
+  <div class="editor" id="editor"></div>
+  <div class="output" id="output"></div>
+</div>
+<div class="footer">
+  <div class="credits">💻 Aula 6 · Projeto @karizeviecelli</div>
+  <a href="03_pratica.html" target="_blank">➜ Seguir para a Prática</a>
+</div>
+<script>
+const lines = [
+  'let frutas = ["maçã",',
+  '"banana", "uva"];',
+  'console.log(frutas[0]);',
+  'console.log(frutas.length);',
+  'frutas.push("laranja");'
+];
+const highlightedLines = [
+  '',
+  '',
+  '',
+  '',
+  ''
+];
+
+let currentLine = 0;
+let currentChar = 0;
+let running = false;
+let timerInterval = null;
+let seconds = 0;
+
+const editorDiv = document.getElementById('editor');
+const outputDiv = document.getElementById('output');
+const cronometro = document.getElementById('cronometro');
+const btnExecutar = document.getElementById('executar');
+const btnReset = document.getElementById('reset');
+const btnRapido = document.getElementById('rapido');
+
+function formatLine(line) {
+  return line.replace(/(let|console|log)/g, '<span class="k">$1</span>')
+             .replace(/("[^"]*")/g, '<span class="s">$1</span>')
+             .replace(/(\d+)/g, '<span class="v">$1</span>');
+}
+
+function renderEditor() {
+  let html = '';
+  for (let i = 0; i < lines.length; i++) {
+    let lineText = lines[i];
+    if (i < currentLine) {
+      html += `<div class="code-line">${formatLine(lineText)}</div>`;
+    } else if (i === currentLine) {
+      let before = lineText.substring(0, currentChar);
+      let after = lineText.substring(currentChar);
+      html += `<div class="code-line">${formatLine(before)}<span class="cursor"></span>${after}</div>`;
+    } else {
+      html += `<div class="code-line">${formatLine(lineText)}</div>`;
+    }
+  }
+  editorDiv.innerHTML = html;
+}
+
+function typeCharacter() {
+  if (!running) return;
+  if (currentLine >= lines.length) {
+    running = false;
+    clearInterval(timerInterval);
+    // highlight last line (the push line)
+    const lastLineDiv = editorDiv.querySelector('.code-line:last-child');
+    if (lastLineDiv) lastLineDiv.classList.add('highlight');
+    return;
+  }
+  const line = lines[currentLine];
+  if (currentChar < line.length) {
+    currentChar++;
+    renderEditor();
+    setTimeout(typeCharacter, 50);
+  } else {
+    // line complete, execute if applicable
+    if (currentLine === 2) { // console.log(frutas[0])
+      outputDiv.innerHTML += '> maçã\n';
+    } else if (currentLine === 3) { // console.log(frutas.length)
+      outputDiv.innerHTML += '> 3\n';
+    }
+    currentLine++;
+    currentChar = 0;
+    setTimeout(typeCharacter, 300);
+  }
+}
+
+function startDemo() {
+  if (running) return;
+  running = true;
+  // start timer
+  if (!timerInterval) {
+    timerInterval = setInterval(() => {
+      seconds++;
+      const m = String(Math.floor(seconds / 60)).padStart(2, '0');
+      const s = String(seconds % 60).padStart(2, '0');
+      cronometro.textContent = `${m}:${s}`;
+    }, 1000);
+  }
+  typeCharacter();
+}
+
+function resetDemo() {
+  running = false;
+  clearInterval(timerInterval);
+  timerInterval = null;
+  seconds = 0;
+  cronometro.textContent = '00:00';
+  currentLine = 0;
+  currentChar = 0;
+  outputDiv.innerHTML = '';
+  renderEditor();
+  // remove highlight from last line if any
+  const lastLineDiv = editorDiv.querySelector('.code-line:last-child');
+  if (lastLineDiv) lastLineDiv.classList.remove('highlight');
+}
+
+function rapidDemo() {
+  resetDemo();
+  // instantly show all lines and output
+  running = true;
+  for (let i = 0; i < lines.length; i++) {
+    currentLine = i + 1;
+    currentChar = lines[i].length;
+  }
+  currentLine = lines.length; // ensure done
+  outputDiv.innerHTML = '> maçã\n> 3\n';
+  renderEditor();
+  // highlight last line
+  const lastLineDiv = editorDiv.querySelector('.code-line:last-child');
+  if (lastLineDiv) lastLineDiv.classList.add('highlight');
+  running = false;
+}
+
+btnExecutar.addEventListener('click', startDemo);
+btnReset.addEventListener('click', resetDemo);
+btnRapido.addEventListener('click', rapidDemo);
+
+// initial render
+renderEditor();
+</script>
+</body>
+</html>

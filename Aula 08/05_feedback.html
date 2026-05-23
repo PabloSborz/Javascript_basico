@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>05_feedback</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: system-ui, sans-serif; }
+        body { background: #f0f4f8; }
+        .topbar { background: #0891b2; color: #fff; padding: 20px; display: flex; justify-content: space-between; align-items: center; }
+        .topbar h1 { font-size: 1.5rem; }
+        .subtopo { padding: 15px 20px; font-size: 1.2rem; font-weight: bold; }
+        .media-panel { padding: 0 20px 20px; display: flex; align-items: center; gap: 15px; }
+        .media-panel .valor { font-size: 2rem; font-weight: bold; }
+        .media-panel .barra { flex: 1; height: 20px; background: #ddd; border-radius: 10px; overflow: hidden; }
+        .media-panel .barra .fill { height: 100%; background: #0891b2; transition: width 0.3s; }
+        .grid-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; padding: 0 20px 20px; }
+        .card { background: #fff; border-radius: 12px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .card h3 { margin-bottom: 10px; }
+        .stars { display: flex; gap: 5px; margin-bottom: 15px; }
+        .star { font-size: 1.8rem; cursor: pointer; color: #ccc; transition: color 0.2s; }
+        .star.active { color: #f59e0b; }
+        .criterios { margin-bottom: 15px; }
+        .criterio { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; }
+        .criterio input { width: 18px; height: 18px; }
+        .obs { width: 100%; margin-bottom: 15px; padding: 8px; border: 1px solid #ccc; border-radius: 8px; resize: vertical; }
+        .actions { display: flex; gap: 10px; flex-wrap: wrap; }
+        .actions button { padding: 8px 16px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; color: #fff; }
+        .btn-apresentando { background: #2563eb; }
+        .btn-concluido { background: #16a34a; }
+        .btn-remover { background: #dc2626; }
+        .add-btn { display: block; margin: 20px auto; padding: 12px 24px; background: #0891b2; color: #fff; border: none; border-radius: 25px; font-size: 1rem; cursor: pointer; }
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center; visibility: hidden; opacity: 0; transition: 0.2s; }
+        .modal-overlay.active { visibility: visible; opacity: 1; }
+        .modal { background: #fff; padding: 30px; border-radius: 12px; width: 90%; max-width: 400px; }
+        .modal h2 { margin-bottom: 20px; }
+        .modal input { width: 100%; padding: 10px; margin-bottom: 20px; border: 1px solid #ccc; border-radius: 8px; }
+        .modal .modal-actions { display: flex; gap: 10px; justify-content: flex-end; }
+        .modal .modal-actions button { padding: 8px 20px; border: none; border-radius: 8px; cursor: pointer; }
+        .modal .btn-confirm { background: #0891b2; color: #fff; }
+        .modal .btn-cancel { background: #ccc; }
+        footer { text-align: center; padding: 20px; color: #666; font-size: 0.9rem; }
+    </style>
+</head>
+<body>
+    <div class="topbar">
+        <h1>📊 Painel de Apresentações — Aula 8</h1>
+        <div id="clock"></div>
+    </div>
+    <div class="subtopo" id="subtopo">👥 0 Alunos</div>
+    <div class="media-panel">
+        <div class="valor" id="mediaValor">0.0</div>
+        <div class="barra"><div class="fill" id="mediaBarra" style="width:0%"></div></div>
+    </div>
+    <div class="grid-cards" id="gridCards"></div>
+    <button class="add-btn" id="addBtn">+ Adicionar Aluno</button>
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal">
+            <h2>Novo Aluno</h2>
+            <input type="text" id="nomeInput" placeholder="Nome do aluno" />
+            <div class="modal-actions">
+                <button class="btn-cancel" id="cancelBtn">Cancelar</button>
+                <button class="btn-confirm" id="confirmBtn">Adicionar</button>
+            </div>
+        </div>
+    </div>
+    <footer>📊 Aula 8 · Projeto @karizeviecelli</footer>
+
+    <script>
+        // Dados
+        let alunos = JSON.parse(localStorage.getItem('feedback_aula8')) || [
+            { nome: 'Ana', estrelas: 0, criterios: [false,false,false,false,false], obs: '' },
+            { nome: 'Bruno', estrelas: 0, criterios: [false,false,false,false,false], obs: '' },
+            { nome: 'Carla', estrelas: 0, criterios: [false,false,false,false,false], obs: '' }
+        ];
+
+        const criteriosLabels = [
+            'Declarou funções com parâmetros corretamente',
+            'Utilizou retorno (return) adequadamente',
+            'Aplicou arrow functions',
+            'Compreendeu callbacks e escopo',
+            'Código executa sem erros'
+        ];
+
+        const gridCards = document.getElementById('gridCards');
+        const subtopo = document.getElementById('subtopo');
+        const mediaValor = document.getElementById('mediaValor');
+        const mediaBarra = document.getElementById('mediaBarra');
+        const addBtn = document.getElementById('addBtn');
+        const modalOverlay = document.getElementById('modalOverlay');
+        const nomeInput = document.getElementById('nomeInput');
+        const confirmBtn = document.getElementById('confirmBtn');
+        const cancelBtn = document.getElementById('cancelBtn');
+
+        // Relógio
+        function updateClock() {
+            const now = new Date();
+            document.getElementById('clock').textContent = now.toLocaleTimeString('pt-BR');
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        // Salvar
+        function salvar() {
+            localStorage.setItem('feedback_aula8', JSON.stringify(alunos));
+        }
+
+        // Atualizar UI
+        function renderizar() {
+            gridCards.innerHTML = '';
+            alunos.forEach((aluno, idx) => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.dataset.index = idx;
+
+                // Nome
+                const nome = document.createElement('h3');
+                nome.textContent = aluno.nome;
+                card.appendChild(nome);
+
+                // Estrelas
+                const starsDiv = document.createElement('div');
+                starsDiv.className = 'stars';
+                for (let s = 1; s <= 5; s++) {
+                    const star = document.createElement('span');
+                    star.className = 'star' + (s <= aluno.estrelas ? ' active' : '');
+                    star.dataset.index = idx;
+                    star.dataset.star = s;
+                    star.textContent = '★';
+                    star.style.cursor = 'pointer';
+                    starsDiv.appendChild(star);
+                }
+                card.appendChild(starsDiv);
+
+                // Critérios
+                const criteriosDiv = document.createElement('div');
+                criteriosDiv.className = 'criterios';
+                criteriosLabels.forEach((label, cIdx) => {
+                    const div = document.createElement('div');
+                    div.className = 'criterio';
+                    const checkbox = document.createElement('input');
+                    checkbox.type = 'checkbox';
+                    checkbox.dataset.index = idx;
+                    checkbox.dataset.criterio = cIdx;
+                    checkbox.checked = aluno.criterios[cIdx];
+                    const labelEl = document.createElement('label');
+                    labelEl.textContent = label;
+                    div.appendChild(checkbox);
+                    div.appendChild(labelEl);
+                    criteriosDiv.appendChild(div);
+                });
+                card.appendChild(criteriosDiv);
+
+                // Textarea
+                const textarea = document.createElement('textarea');
+                textarea.className = 'obs';
+                textarea.placeholder = 'Observação...';
+                textarea.dataset.index = idx;
+                textarea.value = aluno.obs;
+                card.appendChild(textarea);
+
+                // Ações
+                const actions = document.createElement('div');
+                actions.className = 'actions';
+
+                const btnAP = document.createElement('button');
+                btnAP.className = 'btn-apresentando';
+                btnAP.textContent = 'Apresentando';
+                btnAP.dataset.index = idx;
+                btnAP.dataset.action = 'apresentando';
+
+                const btnConc = document.createElement('button');
+                btnConc.className = 'btn-concluido';
+                btnConc.textContent = 'Concluído';
+                btnConc.dataset.index = idx;
+                btnConc.dataset.action = 'concluido';
+
+                const btnRem = document.createElement('button');
+                btnRem.className = 'btn-remover';
+                btnRem.textContent = 'Remover';
+                btnRem.dataset.index = idx;
+                btnRem.dataset.action = 'remover';
+
+                actions.appendChild(btnAP);
+                actions.appendChild(btnConc);
+                actions.appendChild(btnRem);
+                card.appendChild(actions);
+
+                gridCards.appendChild(card);
+            });
+
+            atualizarEstatisticas();
+        }
+
+        function atualizarEstatisticas() {
+            const total = alunos.length;
+            subtopo.textContent = `👥 ${total} Alunos`;
+            if (total === 0) {
+                mediaValor.textContent = '0.0';
+                mediaBarra.style.width = '0%';
+                return;
+            }
+            let soma = 0;
+            alunos.forEach(a => soma += a.estrelas);
+            const media = soma / total;
+            mediaValor.textContent = media.toFixed(1);
+            mediaBarra.style.width = (media / 5 * 100) + '%';
+        }
+
+        // Delegar eventos (clique no gridCards)
+        gridCards.addEventListener('click', function(e) {
+            const target = e.target;
+
+            // Estrelas
+            if (target.classList.contains('star')) {
+                const idx = parseInt(target.dataset.index);
+                const starVal = parseInt(target.dataset.star);
+                alunos[idx].estrelas = starVal;
+                salvar();
+                renderizar();
+                return;
+            }
+
+            // Botões
+            if (target.tagName === 'BUTTON' && target.dataset.action) {
+                const idx = parseInt(target.dataset.index);
+                const action = target.dataset.action;
+                if (action === 'remover') {
+                    alunos.splice(idx, 1);
+                    salvar();
+                    renderizar();
+                } else if (action === 'apresentando') {
+                    alert(`Aluno(a) ${alunos[idx].nome} está apresentando.`);
+                } else if (action === 'concluido') {
+                    alert(`Apresentação de ${alunos[idx].nome} concluída!`);
+                }
+                return;
+            }
+        });
+
+        // Delegar eventos de mudança (checkboxes e textarea)
+        gridCards.addEventListener('change', function(e) {
+            const target = e.target;
+
+            // Checkbox
+            if (target.type === 'checkbox' && target.dataset.criterio !== undefined) {
+                const idx = parseInt(target.dataset.index);
+                const criterioIdx = parseInt(target.dataset.criterio);
+                alunos[idx].criterios[criterioIdx] = target.checked;
+                salvar();
+                renderizar();
+                return;
+            }
+
+            // Textarea
+            if (target.tagName === 'TEXTAREA' && target.classList.contains('obs')) {
+                const idx = parseInt(target.dataset.index);
+                alunos[idx].obs = target.value;
+                salvar();
+            }
+        });
+
+        // Modal
+        addBtn.addEventListener('click', function() {
+            modalOverlay.classList.add('active');
+            nomeInput.value = '';
+            nomeInput.focus();
+        });
+
+        cancelBtn.addEventListener('click', function() {
+            modalOverlay.classList.remove('active');
+        });
+
+        confirmBtn.addEventListener('click', function() {
+            const nome = nomeInput.value.trim();
+            if (nome === '') {
+                alert('Digite um nome.');
+                return;
+            }
+            alunos.push({ nome: nome, estrelas: 0, criterios: [false,false,false,false,false], obs: '' });
+            salvar();
+            renderizar();
+            modalOverlay.classList.remove('active');
+        });
+
+        // Fechar modal clicando fora
+        modalOverlay.addEventListener('click', function(e) {
+            if (e.target === modalOverlay) {
+                modalOverlay.classList.remove('active');
+            }
+        });
+
+        // Render inicial
+        renderizar();
+    </script>
+</body>
+</html>

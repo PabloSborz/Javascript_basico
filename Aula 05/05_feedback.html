@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aula 5 - Laços de Repetição</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background: #f4f4f9; min-height: 100vh; display: flex; flex-direction: column; }
+        .topbar {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+        .topbar h1 { font-size: 20px; font-weight: 600; }
+        .clock { font-size: 16px; background: rgba(255,255,255,0.2); padding: 5px 12px; border-radius: 20px; }
+        .container { margin-top: 70px; padding: 20px; flex: 1; }
+        .subtopo {
+            background: #fff; border-radius: 12px; padding: 18px 24px;
+            display: flex; justify-content: space-between; align-items: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 20px;
+        }
+        .subtopo h2 { font-size: 18px; color: #333; }
+        .subtopo .badge {
+            background: #667eea; color: #fff; padding: 4px 12px; border-radius: 20px;
+            font-size: 14px; font-weight: 500;
+        }
+        .painel-media {
+            background: #fff; border-radius: 12px; padding: 18px 24px;
+            display: flex; justify-content: space-between; align-items: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 20px;
+        }
+        .painel-media .media { font-size: 24px; font-weight: 700; color: #333; }
+        .painel-media .progress-bar {
+            flex: 1; margin-left: 20px; height: 12px; background: #e0e0e0; border-radius: 10px;
+            overflow: hidden;
+        }
+        .painel-media .progress-fill {
+            height: 100%; width: 0%; background: linear-gradient(90deg, #667eea, #764ba2);
+            border-radius: 10px; transition: width 0.3s ease;
+        }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; }
+        .card {
+            background: #fff; border-radius: 12px; padding: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05); transition: transform 0.2s;
+        }
+        .card:hover { transform: translateY(-4px); }
+        .card-header { display: flex; align-items: center; gap: 12px; margin-bottom: 15px; }
+        .avatar {
+            width: 50px; height: 50px; border-radius: 50%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            display: flex; align-items: center; justify-content: center;
+            color: #fff; font-weight: 700; font-size: 20px;
+        }
+        .card-header .info { flex: 1; }
+        .card-header .info h3 { font-size: 16px; color: #333; }
+        .card-header .info .status { font-size: 13px; color: #888; }
+        .card-header .info .status.present { color: #2ecc71; font-weight: 600; }
+        .card-header .info .status.absent { color: #e74c3c; font-weight: 600; }
+        .stars { display: flex; gap: 4px; margin-bottom: 10px; }
+        .star { font-size: 24px; cursor: pointer; color: #ccc; transition: color 0.2s; }
+        .star.active { color: #f1c40f; }
+        .criterios { margin-bottom: 12px; }
+        .criterio { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; font-size: 14px; color: #555; }
+        .criterio input[type="checkbox"] { width: 16px; height: 16px; cursor: pointer; }
+        .nota-textarea { width: 100%; min-height: 60px; padding: 8px; border: 1px solid #ddd; border-radius: 8px; resize: vertical; margin-bottom: 10px; font-size: 14px; }
+        .card-actions { display: flex; gap: 8px; }
+        .btn { padding: 8px 16px; border: none; border-radius: 8px; cursor: pointer; font-weight: 500; transition: all 0.2s; font-size: 14px; }
+        .btn-save { background: #667eea; color: #fff; }
+        .btn-save:hover { background: #5a6fd6; }
+        .btn-delete { background: #e74c3c; color: #fff; }
+        .btn-delete:hover { background: #c0392b; }
+        .btn-add { background: #2ecc71; color: #fff; padding: 10px 20px; font-size: 16px; border: none; border-radius: 8px; cursor: pointer; margin-bottom: 20px; }
+        .btn-add:hover { background: #27ae60; }
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5);
+            display: none; align-items: center; justify-content: center; z-index: 2000;
+        }
+        .modal {
+            background: #fff; border-radius: 12px; padding: 30px; width: 400px; max-width: 90%;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        .modal h2 { margin-bottom: 20px; color: #333; }
+        .modal input { width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; }
+        .modal .btn-modal { padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; margin-right: 10px; }
+        .modal .btn-confirm { background: #667eea; color: #fff; }
+        .modal .btn-confirm:hover { background: #5a6fd6; }
+        .modal .btn-cancel { background: #ccc; color: #333; }
+        .modal .btn-cancel:hover { background: #b3b3b3; }
+        footer {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff; text-align: center; padding: 15px; margin-top: auto;
+            font-size: 14px; font-weight: 300;
+        }
+    </style>
+</head>
+<body>
+    <div class="topbar">
+        <h1>📊 Painel de Apresentações — Aula 5</h1>
+        <div class="clock" id="clock"></div>
+    </div>
+    <div class="container">
+        <div class="subtopo">
+            <h2>Aula 5 - Laços de Repetição — for, while e do...while · 40 minutos</h2>
+            <span class="badge" id="studentCount">0 alunos</span>
+        </div>
+        <div class="painel-media">
+            <span class="media" id="averageDisplay">0.0</span>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+        </div>
+        <button class="btn-add" id="btnAddStudent">+ Adicionar Aluno</button>
+        <div class="grid" id="studentGrid"></div>
+    </div>
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal">
+            <h2>Adicionar Novo Aluno</h2>
+            <input type="text" id="modalNameInput" placeholder="Nome do aluno...">
+            <div>
+                <button class="btn-modal btn-confirm" id="modalConfirm">Adicionar</button>
+                <button class="btn-modal btn-cancel" id="modalCancel">Cancelar</button>
+            </div>
+        </div>
+    </div>
+    <footer>📊 Aula 5 · Projeto @karizeviecelli</footer>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Clock update
+            function updateClock() {
+                const now = new Date();
+                const timeString = now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                document.getElementById('clock').textContent = timeString;
+            }
+            setInterval(updateClock, 1000);
+            updateClock();
+
+            const STORAGE_KEY = 'feedback_aula5';
+            let students = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+            let nextId = students.length > 0 ? Math.max(...students.map(s => s.id)) + 1 : 1;
+
+            const grid = document.getElementById('studentGrid');
+            const studentCount = document.getElementById('studentCount');
+            const averageDisplay = document.getElementById('averageDisplay');
+            const progressFill = document.getElementById('progressFill');
+            const modalOverlay = document.getElementById('modalOverlay');
+            const modalNameInput = document.getElementById('modalNameInput');
+            const modalConfirm = document.getElementById('modalConfirm');
+            const modalCancel = document.getElementById('modalCancel');
+            const btnAdd = document.getElementById('btnAddStudent');
+
+            function save() {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(students));
+                render();
+            }
+
+            function computeAverage() {
+                if (students.length === 0) return 0;
+                const total = students.reduce((sum, s) => sum + s.stars, 0);
+                return total / students.length;
+            }
+
+            function render() {
+                grid.innerHTML = '';
+                students.forEach(student => {
+                    const card = document.createElement('div');
+                    card.className = 'card';
+                    card.dataset.id = student.id;
+                    const initials = student.name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+                    const statusClass = student.present ? 'present' : 'absent';
+                    const statusText = student.present ? 'Presente' : 'Ausente';
+                    card.innerHTML = `
+                        <div class="card-header">
+                            <div class="avatar">${initials}</div>
+                            <div class="info">
+                                <h3>${student.name}</h3>
+                                <span class="status ${statusClass}">${statusText}</span>
+                            </div>
+                        </div>
+                        <div class="stars" data-id="${student.id}">
+                            ${[1,2,3,4,5].map(i => `<span class="star ${i <= student.stars ? 'active' : ''}" data-value="${i}">★</span>`).join('')}
+                        </div>
+                        <div class="criterios">
+                            ${['Implementou laço for corretamente', 'Diferenciou while de do...while', 'Controlou fluxo com break e continue', 'Criou laços aninhados', 'Código executa sem erros'].map((c, idx) => `
+                                <label class="criterio">
+                                    <input type="checkbox" data-criterio="${idx}" ${student.criterios[idx] ? 'checked' : ''}>
+                                    ${c}
+                                </label>
+                            `).join('')}
+                        </div>
+                        <textarea class="nota-textarea" placeholder="Notas do professor...">${student.notes || ''}</textarea>
+                        <div class="card-actions">
+                            <button class="btn btn-save">💾 Salvar</button>
+                            <button class="btn btn-delete">🗑️ Excluir</button>
+                        </div>
+                    `;
+                    grid.appendChild(card);
+                });
+                studentCount.textContent = `${students.length} alunos`;
+                const avg = computeAverage();
+                averageDisplay.textContent = avg.toFixed(1);
+                const pct = students.length > 0 ? (avg / 5) * 100 : 0;
+                progressFill.style.width = pct + '%';
+            }
+
+            // Event delegation for grid
+            grid.addEventListener('click', function(e) {
+                const target = e.target;
+                const card = target.closest('.card');
+                if (!card) return;
+                const id = parseInt(card.dataset.id);
+                const student = students.find(s => s.id === id);
+                if (!student) return;
+
+                // Star click
+                if (target.classList.contains('star')) {
+                    const value = parseInt(target.dataset.value);
+                    student.stars = value;
+                    save();
+                }
+                // Save button
+                if (target.classList.contains('btn-save')) {
+                    const textarea = card.querySelector('.nota-textarea');
+                    const checkboxes = card.querySelectorAll('input[type="checkbox"]');
+                    student.notes = textarea.value;
+                    student.criterios = Array.from(checkboxes).map(cb => cb.checked);
+                    save();
+                }
+                // Delete button
+                if (target.classList.contains('btn-delete')) {
+                    if (confirm('Tem certeza que deseja excluir este aluno?')) {
+                        students = students.filter(s => s.id !== id);
+                        save();
+                    }
+                }
+            });
+
+            // Event delegation for status toggle (click on status text)
+            grid.addEventListener('click', function(e) {
+                const target = e.target;
+                if (target.classList.contains('status')) {
+                    const card = target.closest('.card');
+                    const id = parseInt(card.dataset.id);
+                    const student = students.find(s => s.id === id);
+                    if (student) {
+                        student.present = !student.present;
+                        save();
+                    }
+                }
+            });
+
+            // Modal
+            btnAdd.addEventListener('click', function() {
+                modalOverlay.style.display = 'flex';
+                modalNameInput.value = '';
+                modalNameInput.focus();
+            });
+
+            modalCancel.addEventListener('click', function() {
+                modalOverlay.style.display = 'none';
+            });
+
+            modalConfirm.addEventListener('click', function() {
+                const name = modalNameInput.value.trim();
+                if (!name) {
+                    alert('Por favor, insira um nome.');
+                    return;
+                }
+                const newStudent = {
+                    id: nextId++,
+                    name: name,
+                    present: true,
+                    stars: 0,
+                    criterios: [false, false, false, false, false],
+                    notes: ''
+                };
+                students.push(newStudent);
+                save();
+                modalOverlay.style.display = 'none';
+            });
+
+            // Close modal on overlay click
+            modalOverlay.addEventListener('click', function(e) {
+                if (e.target === modalOverlay) {
+                    modalOverlay.style.display = 'none';
+                }
+            });
+
+            // Initial render
+            render();
+        });
+    </script>
+</body>
+</html>

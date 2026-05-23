@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aula 9 - Demonstração DOM</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #f8fafc; color: #1e293b; }
+.topbar { position: fixed; top:0; left:0; width:100%; height:50px; background:#1e3a5f; color:white; display:flex; align-items:center; justify-content:space-between; padding:0 20px; z-index:100; }
+.controls { position:fixed; top:50px; left:0; width:100%; height:44px; background:#e2e8f0; display:flex; align-items:center; gap:10px; padding:0 20px; z-index:99; }
+.controls button { padding:6px 16px; border:none; border-radius:6px; cursor:pointer; font-weight:600; }
+.btn-exec { background:#10b981; color:white; }
+.btn-reset { background:#ef4444; color:white; }
+.btn-fast { background:#f59e0b; color:white; }
+.container { display:flex; margin-top:94px; height:calc(100vh - 94px - 60px); }
+.editor { width:50%; background:#1e293b; color:#e2e8f0; padding:16px; font-family:'Courier New',monospace; font-size:14px; overflow:auto; white-space:pre-wrap; }
+.output { width:50%; background:#ecfeff; padding:16px; font-family:'Courier New',monospace; font-size:14px; overflow:auto; white-space:pre-wrap; }
+.footer { height:60px; background:#1e3a5f; color:white; display:flex; align-items:center; justify-content:center; gap:20px; }
+.footer a { color:#fbbf24; text-decoration:none; font-weight:600; }
+.highlight .k { color:#ff79c6; }
+.highlight .s { color:#f1fa8c; }
+</style>
+</head>
+<body>
+<div class="topbar">
+<span>💻 Aula 9 · Demonstração</span>
+<span id="timer">00:00</span>
+</div>
+<div class="controls">
+<button class="btn-exec" onclick="executar()">▶ Executar</button>
+<button class="btn-reset" onclick="resetar()">⏹ Reset</button>
+<button class="btn-fast" onclick="rapido()">⚡ Rápido</button>
+</div>
+<div class="container">
+<div class="editor" id="editor"><span class="highlight"><span class="k">let</span> titulo = document.querySelector(<span class="s">"h1"</span>);
+<span class="k">let</span> titulo = document.querySelector(<span class="s">"h1"</span>);
+titulo.textContent = <span class="s">"Olá DOM!"</span>;
+titulo.style.color = <span class="s">"blue"</span>;
+<span class="k">let</span> novoP = document.createElement(<span class="s">"p"</span>);
+novoP.textContent = <span class="s">"Parágrafo criado"</span>;
+document.body.appendChild(novoP);</span></div>
+<div class="output" id="output"></div>
+</div>
+<div class="footer">
+<span>💻 Aula 9 · Projeto @karizeviecelli</span>
+<a href="03_pratica.html">➜ Seguir para a Prática</a>
+</div>
+
+<script>
+let timerInterval;
+let seconds = 0;
+const timerEl = document.getElementById('timer');
+const outputEl = document.getElementById('output');
+
+function startTimer() {
+    clearInterval(timerInterval);
+    seconds = 0;
+    updateTimer();
+    timerInterval = setInterval(() => {
+        seconds++;
+        updateTimer();
+    }, 1000);
+}
+
+function updateTimer() {
+    const m = String(Math.floor(seconds / 60)).padStart(2, '0');
+    const s = String(seconds % 60).padStart(2, '0');
+    timerEl.textContent = `${m}:${s}`;
+}
+
+function executar() {
+    startTimer();
+    outputEl.innerHTML = '';
+    const lines = [
+        'Elemento h1 alterado para "Olá DOM!"',
+        'Parágrafo criado e adicionado ao body'
+    ];
+    let index = 0;
+    function typeWriter() {
+        if (index < lines.length) {
+            outputEl.innerHTML += lines[index] + '\n';
+            index++;
+            setTimeout(typeWriter, 500);
+        }
+    }
+    setTimeout(typeWriter, 300);
+}
+
+function resetar() {
+    clearInterval(timerInterval);
+    seconds = 0;
+    updateTimer();
+    outputEl.innerHTML = '';
+}
+
+function rapido() {
+    executar();
+}
+</script>
+</body>
+</html>

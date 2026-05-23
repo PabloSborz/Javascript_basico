@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Missão DOM</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+  body { background: #0f172a; color: #f8fafc; min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 20px; }
+  .container { max-width: 1200px; width: 100%; }
+  .top-badge { display: flex; justify-content: space-between; align-items: center; background: #1e293b; padding: 12px 20px; border-radius: 12px; margin-bottom: 16px; }
+  .badge { background: #3b82f6; color: #fff; padding: 6px 16px; border-radius: 20px; font-size: 0.9rem; font-weight: 600; }
+  .top-badge h1 { font-size: 1.5rem; font-weight: 700; color: #e2e8f0; }
+  .feedback-btn { background: #22c55e; color: #fff; padding: 10px 24px; border: none; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; display: none; }
+  .context-box { background: #e0f2fe; color: #0c4a6e; padding: 16px; border-radius: 12px; margin-bottom: 20px; font-size: 1rem; line-height: 1.6; }
+  .columns { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px; }
+  .card { background: #1e293b; border-radius: 12px; padding: 20px; }
+  .card h2 { font-size: 1.2rem; margin-bottom: 16px; color: #94a3b8; }
+  .requisito { display: flex; align-items: center; gap: 12px; padding: 12px; margin-bottom: 8px; background: #334155; border-radius: 8px; cursor: pointer; transition: 0.2s; font-size: 0.95rem; }
+  .requisito:hover { background: #475569; }
+  .requisito .status { font-size: 1.4rem; }
+  .requisito.done { background: #064e3b; color: #a7f3d0; }
+  .right-card ul { list-style: none; margin-bottom: 16px; }
+  .right-card li { padding: 6px 0; border-bottom: 1px solid #334155; }
+  .bonus { background: #fef3c7; color: #92400e; padding: 10px; border-radius: 8px; font-weight: 600; text-align: center; }
+  .timer-area { display: flex; align-items: center; justify-content: center; gap: 16px; background: #1e293b; padding: 12px; border-radius: 12px; margin-bottom: 16px; flex-wrap: wrap; }
+  .timer-display { font-size: 1.5rem; font-weight: 700; font-family: monospace; }
+  .timer-btn { background: #3b82f6; color: #fff; border: none; padding: 8px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; }
+  .timer-btn.reset { background: #ef4444; }
+  .progress-area { text-align: center; margin-bottom: 24px; }
+  .progress-text { font-size: 1.1rem; margin-bottom: 8px; }
+  .progress-bar { width: 100%; height: 12px; background: #334155; border-radius: 6px; overflow: hidden; }
+  .progress-fill { height: 100%; background: linear-gradient(90deg, #22c55e, #16a34a); width: 0%; transition: width 0.3s; }
+  .reference { background: #1e293b; padding: 16px; border-radius: 12px; margin-bottom: 16px; font-family: monospace; font-size: 0.9rem; border: 1px solid #334155; }
+  .reference code { color: #facc15; }
+  .cta { display: block; text-align: center; background: #3b82f6; color: #fff; text-decoration: none; padding: 14px; border-radius: 12px; font-weight: 700; font-size: 1.1rem; margin-bottom: 20px; }
+  .cta:hover { background: #2563eb; }
+  .mission-msg { text-align: center; font-size: 1.8rem; font-weight: 700; color: #fbbf24; margin: 20px 0; display: none; }
+  footer { text-align: center; padding: 20px; color: #64748b; font-size: 0.9rem; }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="top-badge">
+    <div>
+      <span class="badge">Desafio Autônomo · 40 min</span>
+      <h1>Missão DOM — selecionar, modificar e interagir</h1>
+    </div>
+    <button id="feedbackBtn" class="feedback-btn" onclick="window.location.href='05_feedback.html'">Feedback →</button>
+  </div>
+
+  <div class="context-box">
+    Você é um Robô em uma missão de interação com páginas web. Precisa manipular elementos do DOM para tornar a página dinâmica. Complete os 4 requisitos para ativar o módulo de interface.
+  </div>
+
+  <div class="columns">
+    <!-- Coluna esquerda -->
+    <div class="card">
+      <h2>📝 Requisitos — clique para marcar</h2>
+      <div id="requisito1" class="requisito" onclick="toggleRequisito(this)">
+        <span class="status">⬜</span>
+        <span>1. Selecionar: Use <code>getElementById</code> para selecionar um elemento e alterar seu texto</span>
+      </div>
+      <div id="requisito2" class="requisito" onclick="toggleRequisito(this)">
+        <span class="status">⬜</span>
+        <span>2. Modificar estilo: Use <code>classList.add()</code> para adicionar uma classe a um elemento</span>
+      </div>
+      <div id="requisito3" class="requisito" onclick="toggleRequisito(this)">
+        <span class="status">⬜</span>
+        <span>3. Evento de clique: Adicione um evento <code>click</code> a um botão que exiba um alerta</span>
+      </div>
+      <div id="requisito4" class="requisito" onclick="toggleRequisito(this)">
+        <span class="status">⬜</span>
+        <span>4. Criar elemento: Use <code>createElement</code> e <code>appendChild</code> para adicionar um novo parágrafo ao body</span>
+      </div>
+    </div>
+
+    <!-- Coluna direita -->
+    <div class="card right-card">
+      <h2>📋 O que entregar</h2>
+      <ul>
+        <li>Elemento selecionado</li>
+        <li>Estilo modificado</li>
+        <li>Evento de clique</li>
+        <li>Elemento criado</li>
+      </ul>
+      <h2>⭐ Critérios</h2>
+      <ul>
+        <li>Usou seletores corretamente</li>
+        <li>Modificou conteúdo/estilo</li>
+        <li>Implementou evento</li>
+        <li>Criou elementos</li>
+      </ul>
+      <div class="bonus">Bônus 🏆 Usou delegação de eventos</div>
+    </div>
+  </div>
+
+  <!-- Cronômetro -->
+  <div class="timer-area">
+    <span class="timer-display" id="timerDisplay">⏱ 00:00</span>
+    <button class="timer-btn" id="startBtn" onclick="startTimer()">▶ Iniciar Missão</button>
+    <button class="timer-btn reset" onclick="resetTimer()">⏹ Reset</button>
+  </div>
+
+  <!-- Progresso -->
+  <div class="progress-area">
+    <div class="progress-text" id="progressText">0 / 4 requisitos</div>
+    <div class="progress-bar">
+      <div class="progress-fill" id="progressFill"></div>
+    </div>
+  </div>
+
+  <!-- Referência rápida -->
+  <div class="reference">
+    <code>document.getElementById("id").textContent = "Novo texto";</code><br>
+    <code>document.querySelector("p").classList.add("destaque");</code>
+  </div>
+
+  <!-- CTA sempre visível -->
+  <a class="cta" href="05_feedback.html">➜ Ver Feedback do Professor</a>
+
+  <!-- Missão cumprida -->
+  <div id="missionMsg" class="mission-msg">🎉 Missão Cumprida!</div>
+
+  <footer>🏆 Aula 9 · Projeto @karizeviecelli</footer>
+</div>
+
+<script>
+  let timerInterval = null;
+  let seconds = 0;
+  let running = false;
+
+  function toggleRequisito(el) {
+    const statusSpan = el.querySelector('.status');
+    const isDone = el.classList.contains('done');
+    if (isDone) {
+      el.classList.remove('done');
+      statusSpan.textContent = '⬜';
+    } else {
+      el.classList.add('done');
+      statusSpan.textContent = '✅';
+    }
+    updateProgress();
+    checkAllDone();
+  }
+
+  function updateProgress() {
+    const doneCount = document.querySelectorAll('.requisito.done').length;
+    document.getElementById('progressText').textContent = doneCount + ' / 4 requisitos';
+    document.getElementById('progressFill').style.width = (doneCount * 25) + '%';
+  }
+
+  function checkAllDone() {
+    const doneCount = document.querySelectorAll('.requisito.done').length;
+    const feedbackBtn = document.getElementById('feedbackBtn');
+    const missionMsg = document.getElementById('missionMsg');
+    if (doneCount === 4) {
+      feedbackBtn.style.display = 'inline-block';
+      missionMsg.style.display = 'block';
+    } else {
+      feedbackBtn.style.display = 'none';
+      missionMsg.style.display = 'none';
+    }
+  }
+
+  function startTimer() {
+    if (running) return;
+    running = true;
+    document.getElementById('startBtn').textContent = '▶ Rodando...';
+    timerInterval = setInterval(() => {
+      seconds++;
+      const mins = Math.floor(seconds / 60).toString().padStart(2, '0');
+      const secs = (seconds % 60).toString().padStart(2, '0');
+      document.getElementById('timerDisplay').textContent = `⏱ ${mins}:${secs}`;
+    }, 1000);
+  }
+
+  function resetTimer() {
+    clearInterval(timerInterval);
+    running = false;
+    seconds = 0;
+    document.getElementById('timerDisplay').textContent = '⏱ 00:00';
+    document.getElementById('startBtn').textContent = '▶ Iniciar Missão';
+  }
+</script>
+</body>
+</html>

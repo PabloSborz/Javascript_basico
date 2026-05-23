@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aula 4 - Demonstração</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+body { background: #0f172a; color: #e2e8f0; }
+.topbar { position: fixed; top: 0; left: 0; right: 0; height: 50px; background: #1e293b; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; border-bottom: 1px solid #334155; z-index: 100; }
+.topbar .titulo { font-size: 16px; font-weight: bold; }
+.topbar .relogio { font-size: 14px; font-family: monospace; }
+.controls { position: fixed; top: 50px; left: 0; right: 0; height: 44px; background: #1e293b; display: flex; align-items: center; gap: 10px; padding: 0 20px; border-bottom: 1px solid #334155; z-index: 99; }
+.controls button { background: #334155; color: #e2e8f0; border: none; padding: 6px 16px; border-radius: 6px; cursor: pointer; font-size: 14px; transition: background 0.2s; }
+.controls button:hover { background: #475569; }
+.controls button.ativo { background: #3b82f6; }
+.container { display: flex; margin-top: 94px; height: calc(100vh - 94px - 80px); }
+.editor { width: 50%; background: #1e293b; padding: 20px; overflow-y: auto; white-space: pre-wrap; font-family: 'Courier New', monospace; font-size: 14px; line-height: 1.6; border-right: 1px solid #334155; }
+.output { width: 50%; background: #ecfeff; color: #0f172a; padding: 20px; overflow-y: auto; font-family: 'Courier New', monospace; font-size: 14px; line-height: 1.6; }
+.footer { position: relative; height: 80px; background: #1e293b; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; border-top: 1px solid #334155; }
+.footer .creditos { font-size: 14px; }
+.footer a { color: #3b82f6; text-decoration: none; font-weight: bold; padding: 8px 16px; border: 1px solid #3b82f6; border-radius: 6px; transition: background 0.2s; }
+.footer a:hover { background: #3b82f6; color: #fff; }
+.chave { color: #f472b6; } /* keywords */
+.s { color: #34d399; } /* strings */
+.v { color: #fbbf24; } /* numbers */
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="titulo">💻 Aula 4 · Demonstração</div>
+  <div class="relogio" id="relogio">00:00</div>
+</div>
+<div class="controls">
+  <button id="botaoExecutar">▶ Executar</button>
+  <button id="botaoReset">⏹ Reset</button>
+  <button id="botaoRapido">⚡ Rápido</button>
+</div>
+<div class="container">
+  <div class="editor" id="editor"></div>
+  <div class="output" id="output"></div>
+</div>
+<div class="footer">
+  <div class="creditos">💻 Aula 4 · Projeto @arizeviecelli</div>
+  <a href="03_pratica.html">➜ Seguir para a Prática</a>
+</div>
+
+<script>
+// Código fonte (6 linhas)
+const codigoFonte = `let idade = 16;
+if (idade >= 18) {
+  console.log("Maior");
+} else {
+  console.log("Menor");
+}`;
+
+// Elementos
+const editor = document.getElementById('editor');
+const output = document.getElementById('output');
+const relogioEl = document.getElementById('relogio');
+const botaoExecutar = document.getElementById('botaoExecutar');
+const botaoReset = document.getElementById('botaoReset');
+const botaoRapido = document.getElementById('botaoRapido');
+
+// Estado
+let executando = false;
+let timerInterval = null;
+let segundos = 0;
+let velocidade = 50; // ms por caractere
+
+// Função para formatar tempo
+function formatarTempo(s) {
+  const min = Math.floor(s / 60);
+  const seg = s % 60;
+  return `${String(min).padStart(2, '0')}:${String(seg).padStart(2, '0')}`;
+}
+
+// Atualizar relógio
+function atualizarRelogio() {
+  relogioEl.textContent = formatarTempo(segundos);
+}
+
+// Iniciar cronômetro
+function iniciarCronometro() {
+  if (timerInterval) return;
+  timerInterval = setInterval(() => {
+    segundos++;
+    atualizarRelogio();
+  }, 1000);
+}
+
+// Parar cronômetro
+function pararCronometro() {
+  clearInterval(timerInterval);
+  timerInterval = null;
+}
+
+// Resetar cronômetro
+function resetarCronometro() {
+  pararCronometro();
+  segundos = 0;
+  atualizarRelogio();
+}
+
+// Função para aplicar realce (highlight)
+function realcarLinha(linha) {
+  // Substituir palavras-chave, strings e números por spans
+  // Ordem: strings (com aspas), números, palavras-chave
+  let resultado = linha;
+  // Strings: "..." ou '...'
+  resultado = resultado.replace(/("[^"]*")|('[^']*')/g, '<span class="s">$&</span>');
+  // Números (inteiros e decimais)
+  resultado = resultado.replace(/\b(\d+(\.\d+)?)\b/g, '<span class="v">$1</span>');
+  // Palavras-chave
+  const chaves = ['let', 'if', 'else', 'console', 'log'];
+  chaves.forEach(chave => {
+    const regex = new RegExp(`\\b${chave}\\b`, 'g');
+    resultado = resultado.replace(regex, `<span class="chave">${chave}</span>`);
+  });
+  return resultado;
+}
+
+// Função para simular digitação (typewriter)
+function digitarCodigo(linhas, indice, charIndex) {
+  if (indice >= linhas.length) {
+    // Terminou de digitar, mostrar saída
+    mostrarSaida();
+    return;
+  }
+  const linhaAtual = linhas[indice];
+  const linhaRealcada = realcarLinha(linhaAtual);
+  // Montar o HTML do editor: linhas anteriores (completas) + atual parcial
+  let html = '';
+  for (let i = 0; i < indice; i++) {
+    html += realcarLinha(linhas[i]) + '\n';
+  }
+  // Linha atual até o caractere atual
+  const textoParcial = linhaAtual.substring(0, charIndex);
+  const realceParcial = realcarLinha(textoParcial);
+  html += realceParcial;
+  editor.innerHTML = html;
+  // Rolar para baixo
+  editor.scrollTop = editor.scrollHeight;
+  // Próximo passo
+  setTimeout(() => {
+    if (charIndex < linhaAtual.length) {
+      digitarCodigo(linhas, indice, charIndex + 1);
+    } else {
+      // Linha completa, passar para próxima
+      digitarCodigo(linhas, indice + 1, 0);
+    }
+  }, velocidade);
+}
+
+// Função para mostrar saída
+function mostrarSaida() {
+  // Simular execução: idade = 16, então "Menor"
+  // Saída esperada: "> Menor"
+  const saida = "> Menor";
+  output.textContent = saida;
+  // Marcar como executado
+  executando = false;
+  botaoExecutar.textContent = '▶ Executar';
+}
+
+// Função principal de execução
+function executar() {
+  if (executando) return;
+  executando = true;
+  botaoExecutar.textContent = '⏳ Executando...';
+  // Resetar editor e saída
+  editor.innerHTML = '';
+  output.innerHTML = '';
+  // Iniciar cronômetro
+  iniciarCronometro();
+  // Dividir código em linhas
+  const linhas = codigoFonte.split('\n');
+  // Iniciar digitação
+  digitarCodigo(linhas, 0, 0);
+}
+
+// Função de reset
+function resetar() {
+  if (executando) {
+    executando = false;
+    botaoExecutar.textContent = '▶ Executar';
+  }
+  resetarCronometro();
+  editor.innerHTML = '';
+  output.innerHTML = '';
+}
+
+// Toggle velocidade
+botaoRapido.addEventListener('click', () => {
+  if (velocidade === 50) {
+    velocidade = 10;
+    botaoRapido.style.background = '#3b82f6';
+  } else {
+    velocidade = 50;
+    botaoRapido.style.background = '';
+  }
+});
+
+// Eventos
+botaoExecutar.addEventListener('click', executar);
+botaoReset.addEventListener('click', resetar);
+
+// Inicializar relógio
+atualizarRelogio();
+</script>
+</body>
+</html>

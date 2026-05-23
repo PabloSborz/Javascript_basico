@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aula 9 - Prática</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
+    body { background: #f4f4f4; padding: 20px; }
+    .container { max-width: 800px; margin: 0 auto; }
+    .topbar { display: flex; justify-content: space-between; align-items: center; background: #6200ea; color: white; padding: 15px 20px; border-radius: 10px; }
+    .topbar h1 { font-size: 1.4rem; }
+    .cronometer { display: flex; align-items: center; gap: 10px; }
+    .cronometer button { background: #fff; border: none; color: #6200ea; padding: 5px 15px; border-radius: 5px; cursor: pointer; font-weight: bold; }
+    .progress-bar { height: 10px; background: #ddd; border-radius: 5px; margin: 20px 0; }
+    .progress-fill { height: 100%; width: 0%; background: #6200ea; border-radius: 5px; transition: width 0.3s; }
+    .card { background: white; border-radius: 8px; margin-bottom: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+    .card-header { display: flex; align-items: center; padding: 15px; cursor: pointer; }
+    .card-header input[type="checkbox"] { margin-right: 15px; width: 20px; height: 20px; }
+    .card-header span { flex: 1; font-weight: bold; }
+    .card-header .arrow { transition: transform 0.3s; }
+    .card.active .card-header .arrow { transform: rotate(90deg); }
+    .card-body { max-height: 0; overflow: hidden; transition: max-height 0.3s; padding: 0 15px; }
+    .card.active .card-body { max-height: 500px; padding: 15px; }
+    .card-body p { margin-bottom: 10px; }
+    .card-body .gabarito { background: #f0f0f0; padding: 10px; border-radius: 5px; font-family: monospace; white-space: pre-wrap; display: none; }
+    .card-body .btn-gabarito { background: #6200ea; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; margin-top: 10px; }
+    .cta { text-align: center; margin: 30px 0; }
+    .cta a { background: #6200ea; color: white; padding: 15px 30px; border-radius: 5px; text-decoration: none; font-weight: bold; display: none; }
+    .footer { text-align: center; color: #888; margin-top: 30px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Topbar -->
+    <div class="topbar">
+      <h1>🛠 Aula 9 · Prática</h1>
+      <div class="cronometer">
+        <span id="timeDisplay">00:00</span>
+        <button id="cronometroBtn">▶️ Play</button>
+      </div>
+    </div>
+    <!-- Progress Bar -->
+    <div class="progress-bar">
+      <div class="progress-fill" id="progressFill"></div>
+    </div>
+    <!-- Cards -->
+    <div id="cardsContainer">
+      <!-- Card 1 -->
+      <div class="card" data-step="1">
+        <div class="card-header">
+          <input type="checkbox" id="check1">
+          <span>Passo 1 - Selecione um elemento e mude seu texto</span>
+          <span class="arrow">▶</span>
+        </div>
+        <div class="card-body">
+          <p><strong>Instrução:</strong> Use getElementById para selecionar um elemento com id "mensagem" e altere seu texto para "Olá, DOM!".</p>
+          <p><strong>Dica:</strong> document.getElementById("id").textContent = "texto";</p>
+          <button class="btn-gabarito">📖 Gabarito</button>
+          <pre class="gabarito">let el = document.getElementById("mensagem"); <br>el.textContent = "Olá, DOM!";</pre>
+        </div>
+      </div>
+      <!-- Card 2 -->
+      <div class="card" data-step="2">
+        <div class="card-header">
+          <input type="checkbox" id="check2">
+          <span>Passo 2 - Adicione uma classe a um elemento</span>
+          <span class="arrow">▶</span>
+        </div>
+        <div class="card-body">
+          <p><strong>Instrução:</strong> Selecione um elemento com querySelector e adicione a classe "destaque" usando classList.add.</p>
+          <p><strong>Dica:</strong> elemento.classList.add("nomeDaClasse");</p>
+          <button class="btn-gabarito">📖 Gabarito</button>
+          <pre class="gabarito">let el = document.querySelector("p"); <br>el.classList.add("destaque");</pre>
+        </div>
+      </div>
+      <!-- Card 3 -->
+      <div class="card" data-step="3">
+        <div class="card-header">
+          <input type="checkbox" id="check3">
+          <span>Passo 3 - Crie um botão que muda cor de fundo</span>
+          <span class="arrow">▶</span>
+        </div>
+        <div class="card-body">
+          <p><strong>Instrução:</strong> Crie um botão no HTML. Ao clicar, a cor de fundo da página muda para uma cor aleatória.</p>
+          <p><strong>Dica:</strong> Use addEventListener('click') e document.body.style.backgroundColor.</p>
+          <button class="btn-gabarito">📖 Gabarito</button>
+          <pre class="gabarito">let btn = document.getElementById("btnCor"); <br>btn.addEventListener("click", function() { <br>document.body.style.backgroundColor = "lightblue";<br> });</pre>
+        </div>
+      </div>
+      <!-- Card 4 -->
+      <div class="card" data-step="4">
+        <div class="card-header">
+          <input type="checkbox" id="check4">
+          <span>Passo 4 - Capture tecla pressionada</span>
+          <span class="arrow">▶</span>
+        </div>
+        <div class="card-body">
+          <p><strong>Instrução:</strong> Adicione um evento keydown ao documento que exiba no console a tecla pressionada.</p>
+          <p><strong>Dica:</strong> document.addEventListener('keydown', function(e) { console.log(e.key); });</p>
+          <button class="btn-gabarito">📖 Gabarito</button>
+          <pre class="gabarito">document.addEventListener("keydown", function(event) { <br>console.log("Tecla: " + event.key); <br>});</pre>
+        </div>
+      </div>
+      <!-- Card 5 -->
+      <div class="card" data-step="5">
+        <div class="card-header">
+          <input type="checkbox" id="check5">
+          <span>Passo 5 - Crie uma lista dinâmica com input</span>
+          <span class="arrow">▶</span>
+        </div>
+        <div class="card-body">
+          <p><strong>Instrução:</strong> Crie um input e um botão. Ao digitar um texto e clicar, o item é adicionado a uma lista (ul).</p>
+          <p><strong>Dica:</strong> createElement('li'), appendChild, value do input.</p>
+          <button class="btn-gabarito">📖 Gabarito</button>
+          <pre class="gabarito">let input = document.getElementById("itemInput"); <br>let btn = document.getElementById("addBtn"); <br>let lista = document.getElementById("lista"); <br>btn.addEventListener("click", function() { <br>let li = document.createElement("li"); <br>li.textContent = input.value; <br>lista.appendChild(li); <br>input.value = ""; <br>});</pre>
+        </div>
+      </div>
+      <!-- Card 6 -->
+      <div class="card" data-step="6">
+        <div class="card-header">
+          <input type="checkbox" id="check6">
+          <span>Passo 6 - Implemente delegação de evento</span>
+          <span class="arrow">▶</span>
+        </div>
+        <div class="card-body">
+          <p><strong>Instrução:</strong> Em uma lista (ul), adicione um evento no pai que detecte qual li foi clicada e exiba seu texto.</p>
+          <p><strong>Dica:</strong> Use e.target.tagName para verificar se clicou em um li.</p>
+          <button class="btn-gabarito">📖 Gabarito</button>
+          <pre class="gabarito">let lista = document.getElementById("lista"); <br>lista.addEventListener("click", function(e) { <br>if (e.target.tagName === "LI") { <br>console.log("Clicou em: " + e.target.textContent);<br> }<br> });</pre>
+        </div>
+      </div>
+    </div>
+    <!-- CTA -->
+    <div class="cta">
+      <a href="04_desafio.html" id="ctaLink">➜ Seguir para o Desafio</a>
+    </div>
+    <!-- Footer -->
+    <div class="footer">
+      🛠 Aula 9 · Projeto @karizeviecelli
+    </div>
+  </div>
+  <script>
+    // --- Cronometer ---
+    const timeDisplay = document.getElementById('timeDisplay');
+    const cronometroBtn = document.getElementById('cronometroBtn');
+    let timerInterval = null;
+    let seconds = 0;
+    let running = false;
+    cronometroBtn.addEventListener('click', function() {
+      if (running) {
+        clearInterval(timerInterval);
+        cronometroBtn.textContent = '▶️ Play';
+      } else {
+        timerInterval = setInterval(function() {
+          seconds++;
+          const mins = String(Math.floor(seconds / 60)).padStart(2, '0');
+          const secs = String(seconds % 60).padStart(2, '0');
+          timeDisplay.textContent = mins + ':' + secs;
+        }, 1000);
+        cronometroBtn.textContent = '⏸️ Pause';
+      }
+      running = !running;
+    });
+
+    // --- Accordion cards ---
+    const cards = document.querySelectorAll('.card');
+    cards.forEach(card => {
+      const header = card.querySelector('.card-header');
+      header.addEventListener('click', function(e) {
+        // Prevent toggle when clicking checkbox
+        if (e.target.type === 'checkbox') return;
+        card.classList.toggle('active');
+      });
+    });
+
+    // --- Gabarito buttons ---
+    const gabaritoBtns = document.querySelectorAll('.btn-gabarito');
+    gabaritoBtns.forEach(btn => {
+      btn.addEventListener('click', function() {
+        const pre = this.nextElementSibling;
+        pre.style.display = pre.style.display === 'block' ? 'none' : 'block';
+      });
+    });
+
+    // --- Checkboxes and progress ---
+    const checkboxes = document.querySelectorAll('.card input[type="checkbox"]');
+    const progressFill = document.getElementById('progressFill');
+    const ctaLink = document.getElementById('ctaLink');
+
+    function updateProgress() {
+      const checked = document.querySelectorAll('.card input[type="checkbox"]:checked').length;
+      const total = checkboxes.length;
+      const pct = (checked / total) * 100;
+      progressFill.style.width = pct + '%';
+      // Show CTA if all checked
+      ctaLink.style.display = (checked === total) ? 'inline-block' : 'none';
+    }
+
+    checkboxes.forEach(cb => {
+      cb.addEventListener('change', updateProgress);
+    });
+
+    // Initial update
+    updateProgress();
+  </script>
+</body>
+</html>

@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aula 8 - Funções (Prática)</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: Arial, sans-serif; background: #f5f5f5; color: #333; padding: 20px; }
+    .container { max-width: 800px; margin: 0 auto; }
+    .topbar { display: flex; align-items: center; justify-content: space-between; background: #007bff; color: #fff; padding: 15px 20px; border-radius: 8px; margin-bottom: 20px; }
+    .topbar h1 { font-size: 1.4em; }
+    .timer { display: flex; align-items: center; gap: 10px; }
+    .timer button { background: #fff; color: #007bff; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 1em; }
+    .timer span { font-size: 1.2em; font-weight: bold; min-width: 60px; text-align: center; }
+    .progress-container { background: #e0e0e0; border-radius: 10px; height: 20px; margin-bottom: 20px; }
+    .progress-bar { background: #28a745; height: 100%; border-radius: 10px; width: 0%; transition: width 0.3s; }
+    .cards { display: flex; flex-direction: column; gap: 10px; }
+    .card { background: #fff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); overflow: hidden; }
+    .card-header { display: flex; align-items: center; padding: 15px; cursor: pointer; background: #f8f9fa; border-bottom: 1px solid #dee2e6; }
+    .card-header input[type="checkbox"] { margin-right: 10px; transform: scale(1.2); }
+    .card-header h2 { font-size: 1em; flex: 1; }
+    .card-header .toggle-icon { transition: transform 0.3s; }
+    .card-content { padding: 0 15px 15px; display: none; }
+    .card.open .card-content { display: block; }
+    .card.open .toggle-icon { transform: rotate(180deg); }
+    .instruction { margin-bottom: 10px; }
+    .hint { background: #fff3cd; padding: 8px; border-radius: 4px; margin-bottom: 10px; font-style: italic; }
+    .btn-gabarito { background: #6c757d; color: #fff; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 0.9em; }
+    .gabarito { margin-top: 10px; background: #263238; color: #e0e0e0; padding: 10px; border-radius: 4px; font-family: monospace; white-space: pre-wrap; display: none; word-break: break-word; }
+    .footer { margin-top: 30px; text-align: center; }
+    .cta { display: inline-block; background: #007bff; color: #fff; padding: 12px 30px; border-radius: 8px; text-decoration: none; font-weight: bold; margin-top: 15px; transition: background 0.3s; }
+    .cta:hover { background: #0056b3; }
+    .footer p { margin-top: 10px; color: #6c757d; font-size: 0.9em; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Topbar -->
+    <div class="topbar">
+      <h1>🛠 Aula 8 · Prática</h1>
+      <div class="timer">
+        <button id="timerBtn">⏸</button>
+        <span id="timerDisplay">00:00</span>
+      </div>
+    </div>
+
+    <!-- Progress Bar -->
+    <div class="progress-container">
+      <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <!-- Accordion Cards -->
+    <div class="cards" id="cardsContainer">
+      <!-- Passo 1 -->
+      <div class="card" data-step="1">
+        <div class="card-header" onclick="toggleCard(this.parentElement)">
+          <input type="checkbox" onchange="updateProgress()">
+          <h2>Passo 1 - Crie função que receba dois números e retorne soma</h2>
+          <span class="toggle-icon">▼</span>
+        </div>
+        <div class="card-content">
+          <div class="instruction"><strong>Instrução:</strong> Crie uma função chamada <code>somar</code> que receba dois parâmetros (a, b) e retorne a soma deles. Chame a função com 5 e 3.</div>
+          <div class="hint"><strong>Dica:</strong> Use <code>function nome(a, b) { <br>return a + b; }</code></div>
+          <button class="btn-gabarito" onclick="showGabarito(this)">📖 Gabarito</button>
+          <div class="gabarito">function somar(a, b) { <br>return a + b; <br>} <br>let resultado = somar(5, 3); <br>console.log(resultado);</div>
+        </div>
+      </div>
+
+      <!-- Passo 2 -->
+      <div class="card" data-step="2">
+        <div class="card-header" onclick="toggleCard(this.parentElement)">
+          <input type="checkbox" onchange="updateProgress()">
+          <h2>Passo 2 - Escreva função que verifique se um número é positivo</h2>
+          <span class="toggle-icon">▼</span>
+        </div>
+        <div class="card-content">
+          <div class="instruction"><strong>Instrução:</strong> Crie uma função <code>isPositivo</code> que receba um número e retorne <code>true</code> se for maior que 0, ou <code>false</code> caso contrário.</div>
+          <div class="hint"><strong>Dica:</strong> Use <code>return n > 0</code> para comparar.</div>
+          <button class="btn-gabarito" onclick="showGabarito(this)">📖 Gabarito</button>
+          <div class="gabarito">function isPositivo(n) { <br>return n > 0; <br>} <br>console.log(isPositivo(10)); <br>console.log(isPositivo(-3));</div>
+        </div>
+      </div>
+
+      <!-- Passo 3 -->
+      <div class="card" data-step="3">
+        <div class="card-header" onclick="toggleCard(this.parentElement)">
+          <input type="checkbox" onchange="updateProgress()">
+          <h2>Passo 3 - Use arrow function para multiplicar</h2>
+          <span class="toggle-icon">▼</span>
+        </div>
+        <div class="card-content">
+          <div class="instruction"><strong>Instrução:</strong> Crie uma arrow function que receba dois números e retorne a multiplicação deles. Armazene em uma variável chamada <code>multiplicar</code>.</div>
+          <div class="hint"><strong>Dica:</strong> <code>let multiplicar = (a, b) => a * b;</code></div>
+          <button class="btn-gabarito" onclick="showGabarito(this)">📖 Gabarito</button>
+          <div class="gabarito">let multiplicar = (a, b) => a * b; <br>console.log(multiplicar(4, 3));</div>
+        </div>
+      </div>
+
+      <!-- Passo 4 -->
+      <div class="card" data-step="4">
+        <div class="card-header" onclick="toggleCard(this.parentElement)">
+          <input type="checkbox" onchange="updateProgress()">
+          <h2>Passo 4 - Crie um callback para filtrar array</h2>
+          <span class="toggle-icon">▼</span>
+        </div>
+        <div class="card-content">
+          <div class="instruction"><strong>Instrução:</strong> Crie um array de números e use <code>filter()</code> com uma função callback para selecionar os maiores que 3.</div>
+          <div class="hint"><strong>Dica:</strong> <code>filter</code> recebe uma função que retorna <code>true</code>/<code>false</code>.</div>
+          <button class="btn-gabarito" onclick="showGabarito(this)">📖 Gabarito</button>
+          <div class="gabarito">let nums = [1, 2, 3, 4, 5]; <br> let maiores = nums.filter(function(n) { <br>return n > 3; <br>}); <br>console.log(maiores);</div>
+        </div>
+      </div>
+
+      <!-- Passo 5 -->
+      <div class="card" data-step="5">
+        <div class="card-header" onclick="toggleCard(this.parentElement)">
+          <input type="checkbox" onchange="updateProgress()">
+          <h2>Passo 5 - Implemente função com parâmetro default</h2>
+          <span class="toggle-icon">▼</span>
+        </div>
+        <div class="card-content">
+          <div class="instruction"><strong>Instrução:</strong> Crie uma função <code>cumprimentar</code> que receba um nome e exiba "Olá, [nome]!". Se nenhum nome for passado, use "Visitante" como padrão.</div>
+          <div class="hint"><strong>Dica:</strong> <code>function cumprimentar(nome = "Visitante") { }</code></div>
+          <button class="btn-gabarito" onclick="showGabarito(this)">📖 Gabarito</button>
+          <div class="gabarito">function cumprimentar(nome = "Visitante") { <br>console.log("Olá, " + nome + "!"); <br>} <br>cumprimentar("Ana"); <br>cumprimentar();</div>
+        </div>
+      </div>
+
+      <!-- Passo 6 -->
+      <div class="card" data-step="6">
+        <div class="card-header" onclick="toggleCard(this.parentElement)">
+          <input type="checkbox" onchange="updateProgress()">
+          <h2>Passo 6 - Chame uma função dentro de outra</h2>
+          <span class="toggle-icon">▼</span>
+        </div>
+        <div class="card-content">
+          <div class="instruction"><strong>Instrução:</strong> Crie duas funções: <code>quadrado(n)</code> e <code>somaQuadrados(a, b)</code>. <code>somaQuadrados</code> deve chamar <code>quadrado</code> internamente.</div>
+          <div class="hint"><strong>Dica:</strong> Uma função chama a outra pelo nome.</div>
+          <button class="btn-gabarito" onclick="showGabarito(this)">📖 Gabarito</button>
+          <div class="gabarito">function quadrado(n) { <br>return n * n; <br>}<br> function somaQuadrados(a, b) {<br> return quadrado(a) + quadrado(b); <br>} <br>console.log(somaQuadrados(3, 4));</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer and CTA -->
+    <div class="footer">
+      <p>🛠 Aula 8 · Projeto @karizeviecelli</p>
+      <a href="04_desafio.html" class="cta" id="ctaLink">➜ Seguir para o Desafio</a>
+    </div>
+  </div>
+
+  <script>
+    // Timer
+    let timerInterval;
+    let seconds = 0;
+    const timerDisplay = document.getElementById('timerDisplay');
+    const timerBtn = document.getElementById('timerBtn');
+    timerBtn.addEventListener('click', () => {
+      if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+        timerBtn.textContent = '▶';
+      } else {
+        timerInterval = setInterval(() => {
+          seconds++;
+          const min = String(Math.floor(seconds / 60)).padStart(2, '0');
+          const sec = String(seconds % 60).padStart(2, '0');
+          timerDisplay.textContent = `${min}:${sec}`;
+        }, 1000);
+        timerBtn.textContent = '⏸';
+      }
+    });
+
+    // Accordion toggle
+    function toggleCard(card) {
+      card.classList.toggle('open');
+    }
+
+    // Show gabarito (plain text code)
+    function showGabarito(btn) {
+      const gab = btn.nextElementSibling;
+      if (gab.style.display === 'block') {
+        gab.style.display = 'none';
+      } else {
+        gab.style.display = 'block';
+      }
+    }
+
+    // Progress bar
+    function updateProgress() {
+      const checkboxes = document.querySelectorAll('.card-header input[type="checkbox"]');
+      const total = checkboxes.length;
+      const checked = document.querySelectorAll('.card-header input[type="checkbox"]:checked').length;
+      const percent = (checked / total) * 100;
+      document.getElementById('progressBar').style.width = percent + '%';
+
+      // Optionally enable/disable CTA when all checked
+      const cta = document.getElementById('ctaLink');
+      if (checked === total) {
+        cta.classList.add('ready');
+      } else {
+        cta.classList.remove('ready');
+      }
+    }
+  </script>
+</body>
+</html>

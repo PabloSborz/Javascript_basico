@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>04_desafio.html - Aula 8</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; font-family: system-ui, sans-serif; }
+  body { background: #f8fafc; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
+  .container { max-width: 1000px; width: 100%; background: white; border-radius: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); overflow: hidden; }
+  .header { background: linear-gradient(135deg, #2563eb, #1d4ed8); color: white; padding: 24px 32px; }
+  .badge { display: inline-block; background: #fbbf24; color: #1e3a5f; padding: 4px 12px; border-radius: 20px; font-weight: 700; font-size: 0.8rem; margin-bottom: 8px; }
+  .header h1 { font-size: 1.8rem; margin: 0; display: inline; }
+  .feedback-btn { float: right; background: #10b981; color: white; padding: 10px 24px; border: none; border-radius: 40px; font-weight: 600; cursor: pointer; text-decoration: none; display: none; transition: 0.2s; }
+  .feedback-btn.mostrar { display: inline-block; }
+  .feedback-btn:hover { background: #059669; }
+  .context { background: #e0f2fe; padding: 16px 32px; font-size: 0.95rem; color: #1e293b; border-left: 4px solid #3b82f6; }
+  .main { display: flex; flex-wrap: wrap; gap: 20px; padding: 24px 32px; }
+  .left { flex: 1; min-width: 280px; }
+  .right { flex: 1; min-width: 280px; display: flex; flex-direction: column; gap: 16px; }
+  .card { background: #f1f5f9; border-radius: 16px; padding: 20px; }
+  .card h2 { font-size: 1.1rem; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+  .requisito { display: flex; align-items: flex-start; gap: 10px; padding: 10px 12px; margin-bottom: 8px; background: white; border-radius: 10px; cursor: pointer; transition: 0.2s; border: 2px solid transparent; }
+  .requisito:hover { border-color: #94a3b8; }
+  .requisito.completado { border-color: #10b981; background: #d1fae5; }
+  .requisito .check { font-size: 1.2rem; min-width: 24px; text-align: center; }
+  .requisito .texto { font-size: 0.95rem; }
+  .requisito .desc { display: block; font-size: 0.8rem; color: #64748b; margin-top: 2px; }
+  .bonus { background: #fef3c7; border-radius: 12px; padding: 14px; font-size: 0.9rem; }
+  .timer-section { display: flex; align-items: center; gap: 12px; padding: 8px 0; flex-wrap: wrap; }
+  .timer { font-size: 1.8rem; font-weight: 700; font-variant-numeric: tabular-nums; color: #1e293b; }
+  .timer-btn { padding: 6px 16px; border: none; border-radius: 30px; font-weight: 600; cursor: pointer; font-size: 0.9rem; background: #e2e8f0; transition: 0.2s; }
+  .timer-btn:hover { background: #cbd5e1; }
+  .timer-btn.iniciar { background: #3b82f6; color: white; }
+  .timer-btn.iniciar:hover { background: #2563eb; }
+  .progress { margin: 12px 0; }
+  .progress-text { font-size: 0.95rem; font-weight: 600; margin-bottom: 4px; }
+  .progress-bar { height: 10px; background: #e2e8f0; border-radius: 20px; overflow: hidden; }
+  .progress-fill { height: 100%; width: 0%; background: linear-gradient(90deg, #3b82f6, #10b981); transition: width 0.3s; }
+  .referencia { background: #1e293b; color: #e2e8f0; border-radius: 16px; padding: 16px; font-size: 0.85rem; }
+  .referencia code { display: block; background: #0f172a; padding: 10px; border-radius: 8px; margin-top: 8px; font-family: 'Courier New', monospace; }
+  .cta { margin-top: 8px; }
+  .cta a { display: inline-block; background: #8b5cf6; color: white; padding: 10px 20px; border-radius: 40px; text-decoration: none; font-weight: 600; font-size: 0.9rem; transition: 0.2s; }
+  .cta a:hover { background: #7c3aed; }
+  .mensagem-final { display: none; font-size: 1.2rem; font-weight: 700; color: #10b981; padding: 8px 0; }
+  .footer { background: #f1f5f9; text-align: center; padding: 16px 32px; font-size: 0.9rem; color: #475569; border-top: 1px solid #e2e8f0; }
+  @media (max-width: 640px) { .main { flex-direction: column; } .header h1 { font-size: 1.4rem; } }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <span class="badge">Desafio Autônomo · 40 min</span>
+    <h1>Missão Funções — parâmetros, retorno e reutilização</h1>
+    <a href="05_feedback.html" class="feedback-btn" id="feedbackBtn">Feedback →</a>
+  </div>
+  <div class="context">
+    Você é um Robô em uma missão de automação de tarefas. Precisa criar funções para organizar e reutilizar seu código. Complete os 4 requisitos para ativar o módulo de automação.
+  </div>
+  <div class="main">
+    <div class="left">
+      <div class="card">
+        <h2>📝 Requisitos — clique para marcar como concluído</h2>
+        <div class="requisito" onclick="toggleRequisito(this, 0)">
+          <span class="check">⬜</span>
+          <div class="texto">
+            1. Função simples
+            <span class="desc">Crie uma função chamada saudacao que exiba "Missão iniciada!" no console</span>
+          </div>
+        </div>
+        <div class="requisito" onclick="toggleRequisito(this, 1)">
+          <span class="check">⬜</span>
+          <div class="texto">
+            2. Parâmetros
+            <span class="desc">Crie uma função que receba um nome e exiba "Olá, [nome]!"</span>
+          </div>
+        </div>
+        <div class="requisito" onclick="toggleRequisito(this, 2)">
+          <span class="check">⬜</span>
+          <div class="texto">
+            3. Return
+            <span class="desc">Crie uma função que receba um número e retorne o triplo dele</span>
+          </div>
+        </div>
+        <div class="requisito" onclick="toggleRequisito(this, 3)">
+          <span class="check">⬜</span>
+          <div class="texto">
+            4. Arrow function
+            <span class="desc">Crie uma arrow function que receba dois números e retorne o maior deles</span>
+          </div>
+        </div>
+      </div>
+      <div class="timer-section">
+        <span class="timer" id="timerDisplay">⏱ 00:00</span>
+        <button class="timer-btn iniciar" onclick="startTimer()" id="startBtn">▶ Iniciar Missão</button>
+        <button class="timer-btn" onclick="resetTimer()">⏹ Reset</button>
+      </div>
+    </div>
+    <div class="right">
+      <div class="card">
+        <h2>📋 O que entregar</h2>
+        <ul style="list-style: none;">
+          <li>✅ Função declarada</li>
+          <li>✅ Uso de parâmetros</li>
+          <li>✅ Retorno com return</li>
+          <li>✅ Arrow function</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h2>⭐ Critérios</h2>
+        <ul style="list-style: none;">
+          <li>✅ Declarou função corretamente</li>
+          <li>✅ Usou parâmetros</li>
+          <li>✅ Retornou valor</li>
+          <li>✅ Usou arrow function</li>
+        </ul>
+      </div>
+      <div class="bonus">
+        <strong>Bônus 🏆</strong><br>
+        Usou callback (função dentro de função)
+      </div>
+      <div class="progress">
+        <div class="progress-text" id="progressText">0 / 4 requisitos</div>
+        <div class="progress-bar">
+          <div class="progress-fill" id="progressFill"></div>
+        </div>
+      </div>
+      <div class="referencia">
+        <strong>Referência Rápida</strong>
+        <code>
+function dobro(x) { return x * 2; }<br>
+console.log(dobro(5));
+        </code>
+      </div>
+      <div class="cta">
+        <a href="05_feedback.html">➜ Ver Feedback do Professor</a>
+      </div>
+      <div class="mensagem-final" id="mensagemFinal">🎉 Missão Cumprida!</div>
+    </div>
+  </div>
+  <div class="footer">
+    🏆 Aula 8 · Projeto @karizeviecelli
+  </div>
+</div>
+<script>
+  const requisitos = document.querySelectorAll('.requisito');
+  const checkSpans = document.querySelectorAll('.requisito .check');
+  const progressText = document.getElementById('progressText');
+  const progressFill = document.getElementById('progressFill');
+  const feedbackBtn = document.getElementById('feedbackBtn');
+  const mensagemFinal = document.getElementById('mensagemFinal');
+
+  function toggleRequisito(element, index) {
+    element.classList.toggle('completado');
+    const isCompleted = element.classList.contains('completado');
+    checkSpans[index].textContent = isCompleted ? '✅' : '⬜';
+    updateProgress();
+  }
+
+  function updateProgress() {
+    const completados = document.querySelectorAll('.requisito.completado').length;
+    progressText.textContent = `${completados} / 4 requisitos`;
+    const percent = (completados / 4) * 100;
+    progressFill.style.width = `${percent}%`;
+    if (completados === 4) {
+      feedbackBtn.classList.add('mostrar');
+      mensagemFinal.style.display = 'block';
+    } else {
+      feedbackBtn.classList.remove('mostrar');
+      mensagemFinal.style.display = 'none';
+    }
+  }
+
+  // Timer
+  let timerInterval = null;
+  let seconds = 0;
+  const timerDisplay = document.getElementById('timerDisplay');
+  const startBtn = document.getElementById('startBtn');
+
+  function formatTime(sec) {
+    const mins = Math.floor(sec / 60);
+    const remainingSec = sec % 60;
+    return `⏱ ${String(mins).padStart(2, '0')}:${String(remainingSec).padStart(2, '0')}`;
+  }
+
+  function updateTimerDisplay() {
+    timerDisplay.textContent = formatTime(seconds);
+  }
+
+  function startTimer() {
+    if (timerInterval) return;
+    timerInterval = setInterval(() => {
+      seconds++;
+      updateTimerDisplay();
+    }, 1000);
+    startBtn.textContent = '▶ Em andamento';
+    startBtn.disabled = true;
+    startBtn.style.opacity = '0.6';
+  }
+
+  function resetTimer() {
+    clearInterval(timerInterval);
+    timerInterval = null;
+    seconds = 0;
+    updateTimerDisplay();
+    startBtn.textContent = '▶ Iniciar Missão';
+    startBtn.disabled = false;
+    startBtn.style.opacity = '1';
+  }
+
+  // Initialize
+  updateProgress();
+  updateTimerDisplay();
+</script>
+</body>
+</html>

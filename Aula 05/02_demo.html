@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aula 5 - Laços de Repetição</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+body { background: #0f172a; color: #f8fafc; min-height: 100vh; display: flex; flex-direction: column; }
+.topbar { position: fixed; top: 0; left: 0; right: 0; height: 50px; background: #1e293b; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; z-index: 100; border-bottom: 1px solid #334155; }
+.topbar h1 { font-size: 18px; font-weight: 600; }
+.timer { font-size: 14px; background: #334155; padding: 4px 12px; border-radius: 20px; }
+.controls { position: fixed; top: 50px; left: 0; right: 0; height: 44px; background: #1e293b; display: flex; align-items: center; gap: 8px; padding: 0 20px; z-index: 99; border-bottom: 1px solid #334155; }
+.controls button { background: #334155; color: #f8fafc; border: none; padding: 6px 16px; border-radius: 6px; cursor: pointer; font-size: 14px; transition: background 0.2s; }
+.controls button:hover { background: #475569; }
+.container { display: flex; margin-top: 94px; flex: 1; height: calc(100vh - 94px - 50px); }
+.editor { width: 50%; background: #1e293b; padding: 16px; overflow-y: auto; font-family: 'Courier New', monospace; font-size: 14px; line-height: 1.6; white-space: pre; }
+.output { width: 50%; background: #ecfeff; padding: 16px; overflow-y: auto; font-family: 'Courier New', monospace; font-size: 14px; line-height: 1.6; color: #0f172a; white-space: pre; }
+.footer { background: #1e293b; padding: 12px 20px; text-align: center; border-top: 1px solid #334155; font-size: 14px; display: flex; justify-content: center; align-items: center; gap: 16px; }
+.footer a { color: #38bdf8; text-decoration: none; padding: 6px 16px; border: 1px solid #38bdf8; border-radius: 6px; transition: background 0.2s; }
+.footer a:hover { background: #38bdf8; color: #0f172a; }
+.highlight-keyword { color: #c084fc; }
+.highlight-function { color: #facc15; }
+.highlight-number { color: #fb7185; }
+.highlight-operator { color: #a5f3fc; }
+.highlight-punctuation { color: #f8fafc; }
+.highlight-comment { color: #6b7280; }
+</style>
+</head>
+<body>
+<div class="topbar">
+  <h1>💻 Aula 5 · Demonstração</h1>
+  <div class="timer" id="timer">⏱ 0.0s</div>
+</div>
+<div class="controls">
+  <button id="executarBtn">▶ Executar</button>
+  <button id="resetBtn">⏹ Reset</button>
+  <button id="rapidoBtn">⚡ Rápido</button>
+</div>
+<div class="container">
+  <div class="editor" id="editor"></div>
+  <div class="output" id="output"></div>
+</div>
+<div class="footer">
+  <span>💻 Aula 5 · Projeto @karizeviecelli</span>
+  <a href="03_pratica.html">➜ Seguir para a Prática</a>
+</div>
+<script>
+const editor = document.getElementById('editor');
+const output = document.getElementById('output');
+const timerDisplay = document.getElementById('timer');
+const executarBtn = document.getElementById('executarBtn');
+const resetBtn = document.getElementById('resetBtn');
+const rapidoBtn = document.getElementById('rapidoBtn');
+
+const codeLines = [
+  'for (let i = 1;',
+  'i <= 5;',
+  'i++) {',
+  '  console.log(i);',
+  '}'
+];
+
+const expectedOutput = '> 1\n> 2\n> 3\n> 4\n> 5';
+
+let isRunning = false;
+let isFast = false;
+let typingInterval = null;
+let timerInterval = null;
+let currentLine = 0;
+let currentChar = 0;
+let startTime = null;
+
+function resetAll() {
+  if (typingInterval) clearInterval(typingInterval);
+  if (timerInterval) clearInterval(timerInterval);
+  isRunning = false;
+  currentLine = 0;
+  currentChar = 0;
+  editor.textContent = '';
+  output.textContent = '';
+  timerDisplay.textContent = '⏱ 0.0s';
+  startTime = null;
+  executarBtn.disabled = false;
+}
+
+function updateTimer() {
+  if (!startTime) return;
+  const elapsed = (Date.now() - startTime) / 1000;
+  timerDisplay.textContent = `⏱ ${elapsed.toFixed(1)}s`;
+}
+
+function typeNextChar() {
+  if (currentLine >= codeLines.length) {
+    clearInterval(typingInterval);
+    clearInterval(timerInterval);
+    isRunning = false;
+    executarBtn.disabled = false;
+    output.textContent = expectedOutput;
+    return;
+  }
+  const line = codeLines[currentLine];
+  if (currentChar < line.length) {
+    editor.textContent += line[currentChar];
+    currentChar++;
+  } else {
+    editor.textContent += '\n';
+    currentLine++;
+    currentChar = 0;
+  }
+}
+
+function highlightCode(code) {
+  // Simple syntax highlighting by replacing tokens with spans
+  const keywords = ['for', 'let', 'console', 'log'];
+  let highlighted = code.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  highlighted = highlighted.replace(/(for|let|console\.log)/g, '<span class="highlight-keyword">$1</span>');
+  highlighted = highlighted.replace(/(\(|\)|\{|\})/g, '<span class="highlight-punctuation">$1</span>');
+  highlighted = highlighted.replace(/(\d+)/g, '<span class="highlight-number">$1</span>');
+  highlighted = highlighted.replace(/(;|=|<=|\+\+|\+)/g, '<span class="highlight-operator">$1</span>');
+  return highlighted;
+}
+
+function startExecution() {
+  resetAll();
+  isRunning = true;
+  executarBtn.disabled = true;
+  startTime = Date.now();
+  timerInterval = setInterval(updateTimer, 100);
+  const speed = isFast ? 20 : 80;
+  typingInterval = setInterval(typeNextChar, speed);
+}
+
+function toggleFast() {
+  isFast = !isFast;
+  rapidoBtn.textContent = isFast ? '⚡ Normal' : '⚡ Rápido';
+}
+
+executarBtn.addEventListener('click', startExecution);
+resetBtn.addEventListener('click', resetAll);
+rapidoBtn.addEventListener('click', toggleFast);
+
+// Initial display (empty)
+resetAll();
+</script>
+</body>
+</html>

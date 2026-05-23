@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Feedback Aula 6 - Arrays</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+body { background: #f0f2f5; padding-top: 60px; }
+.topbar { position: fixed; top: 0; left: 0; right: 0; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.2); }
+.topbar h1 { font-size: 1.3rem; }
+#clock { font-size: 1rem; background: rgba(255,255,255,0.2); padding: 4px 12px; border-radius: 20px; }
+.subtopo { background: white; padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #ddd; }
+.subtopo h2 { font-size: 1.1rem; color: #333; }
+.badge { background: #667eea; color: white; padding: 4px 12px; border-radius: 12px; font-size: 0.8rem; }
+.painel-media { background: white; margin: 20px; padding: 20px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); text-align: center; }
+.painel-media h3 { font-size: 2rem; color: #667eea; }
+.progress-container { width: 100%; background: #e0e0e0; border-radius: 10px; margin: 10px 0; height: 20px; }
+.progress-bar { height: 100%; background: linear-gradient(90deg, #667eea, #764ba2); border-radius: 10px; width: 0%; transition: width 0.3s; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 20px; padding: 20px; }
+.card { background: white; border-radius: 10px; padding: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); position: relative; }
+.card-header { display: flex; align-items: center; margin-bottom: 15px; }
+.avatar { width: 50px; height: 50px; border-radius: 50%; background: #667eea; color: white; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: bold; margin-right: 15px; }
+.student-info { flex: 1; }
+.student-name { font-weight: bold; font-size: 1.1rem; }
+.status { font-size: 0.8rem; color: #888; }
+.status.presente { color: #28a745; }
+.status.ausente { color: #dc3545; }
+.stars { display: flex; gap: 5px; margin: 10px 0; cursor: pointer; }
+.star { font-size: 1.5rem; color: #ccc; transition: color 0.2s; }
+.star.active { color: #f5c518; }
+.criterios { margin: 10px 0; }
+.criterio { display: flex; align-items: center; margin: 5px 0; }
+.criterio input { margin-right: 8px; }
+.comentario { width: 100%; min-height: 60px; padding: 8px; border: 1px solid #ccc; border-radius: 5px; resize: vertical; margin: 10px 0; }
+.card-buttons { display: flex; gap: 10px; justify-content: flex-end; }
+.btn { padding: 8px 16px; border: none; border-radius: 5px; cursor: pointer; font-size: 0.9rem; transition: opacity 0.2s; }
+.btn:hover { opacity: 0.8; }
+.btn-primary { background: #667eea; color: white; }
+.btn-danger { background: #dc3545; color: white; }
+.btn-add { display: block; margin: 20px auto; padding: 12px 24px; background: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 1rem; }
+.modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 200; }
+.modal-content { background: white; padding: 30px; border-radius: 10px; width: 90%; max-width: 400px; }
+.modal-content h3 { margin-bottom: 20px; }
+.modal-content input { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px; }
+.footer { background: #333; color: white; text-align: center; padding: 15px; margin-top: 30px; }
+@media (max-width: 600px) {
+  .grid { grid-template-columns: 1fr; }
+  .subtopo { flex-direction: column; gap: 10px; }
+}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <h1>📊 Painel de Apresentações — Aula 6</h1>
+  <div id="clock"></div>
+</div>
+<div class="subtopo">
+  <h2>Aula 6 - Arrays — Listas, índices e métodos · 40 minutos</h2>
+  <span class="badge" id="alunosBadge">0 alunos</span>
+</div>
+<div class="painel-media">
+  <h3 id="mediaValue">0.0</h3>
+  <div class="progress-container">
+    <div class="progress-bar" id="mediaBar"></div>
+  </div>
+  <span>Média das avaliações</span>
+</div>
+<div id="feedbackContainer" class="grid"></div>
+<button class="btn-add" id="addBtn">+ Adicionar Aluno</button>
+<div class="modal" id="modal">
+  <div class="modal-content">
+    <h3>Adicionar Novo Aluno</h3>
+    <input type="text" id="newName" placeholder="Nome do aluno" />
+    <div style="margin: 10px 0;">
+      <label>Status:</label>
+      <select id="newStatus">
+        <option value="presente">Presente</option>
+        <option value="ausente">Ausente</option>
+      </select>
+    </div>
+    <button class="btn btn-primary" id="saveNew">Salvar</button>
+    <button class="btn btn-danger" id="cancelNew">Cancelar</button>
+  </div>
+</div>
+<footer class="footer">📊 Aula 6 · Projeto @karizeviecelli</footer>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Clock
+  function updateClock() {
+    const now = new Date();
+    document.getElementById('clock').textContent = now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  }
+  setInterval(updateClock, 1000);
+  updateClock();
+
+  // Estado
+  const STORAGE_KEY = 'feedback_aula6';
+  let alunos = [];
+
+  function carregar() {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (stored) {
+      try {
+        alunos = JSON.parse(stored);
+      } catch(e) {
+        alunos = [];
+      }
+    }
+    if (alunos.length === 0) {
+      alunos = [
+        { id: 1, nome: 'Ana Silva', status: 'presente', estrelas: 3, criterios: [false, false, false, false, false], comentario: '' },
+        { id: 2, nome: 'Bruno Costa', status: 'presente', estrelas: 4, criterios: [false, false, false, false, false], comentario: '' },
+        { id: 3, nome: 'Carla Souza', status: 'ausente', estrelas: 0, criterios: [false, false, false, false, false], comentario: '' }
+      ];
+    }
+    renderizar();
+  }
+
+  function salvar() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(alunos));
+    atualizarMedia();
+  }
+
+  function renderizar() {
+    const container = document.getElementById('feedbackContainer');
+    container.innerHTML = '';
+    alunos.forEach((aluno, index) => {
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.dataset.index = index;
+
+      // Header
+      const header = document.createElement('div');
+      header.className = 'card-header';
+      header.innerHTML = `
+        <div class="avatar">${aluno.nome.charAt(0).toUpperCase()}</div>
+        <div class="student-info">
+          <div class="student-name">${aluno.nome}</div>
+          <div class="status ${aluno.status}">${aluno.status === 'presente' ? 'Presente' : 'Ausente'}</div>
+        </div>
+      `;
+      card.appendChild(header);
+
+      // Stars
+      const starsDiv = document.createElement('div');
+      starsDiv.className = 'stars';
+      for (let i = 1; i <= 5; i++) {
+        const star = document.createElement('span');
+        star.className = 'star' + (i <= aluno.estrelas ? ' active' : '');
+        star.dataset.value = i;
+        star.textContent = '★';
+        starsDiv.appendChild(star);
+      }
+      card.appendChild(starsDiv);
+
+      // Criterios
+      const criteriosDiv = document.createElement('div');
+      criteriosDiv.className = 'criterios';
+      const labels = ['Criou e manipulou arrays', 'Usou push/pop/shift/unshift', 'Aplicou map/filter/reduce', 'Compreendeu índices e length', 'Código executa sem erros'];
+      labels.forEach((label, idx) => {
+        const div = document.createElement('div');
+        div.className = 'criterio';
+        const cb = document.createElement('input');
+        cb.type = 'checkbox';
+        cb.checked = aluno.criterios[idx];
+        cb.dataset.index = index;
+        cb.dataset.criterio = idx;
+        const lbl = document.createElement('label');
+        lbl.textContent = label;
+        div.appendChild(cb);
+        div.appendChild(lbl);
+        criteriosDiv.appendChild(div);
+      });
+      card.appendChild(criteriosDiv);
+
+      // Textarea
+      const textarea = document.createElement('textarea');
+      textarea.className = 'comentario';
+      textarea.placeholder = 'Comentário...';
+      textarea.value = aluno.comentario;
+      textarea.dataset.index = index;
+      card.appendChild(textarea);
+
+      // Buttons
+      const btnDiv = document.createElement('div');
+      btnDiv.className = 'card-buttons';
+      const saveBtn = document.createElement('button');
+      saveBtn.className = 'btn btn-primary';
+      saveBtn.textContent = 'Salvar';
+      saveBtn.dataset.index = index;
+      saveBtn.dataset.action = 'save';
+      const deleteBtn = document.createElement('button');
+      deleteBtn.className = 'btn btn-danger';
+      deleteBtn.textContent = 'Excluir';
+      deleteBtn.dataset.index = index;
+      deleteBtn.dataset.action = 'delete';
+      btnDiv.appendChild(saveBtn);
+      btnDiv.appendChild(deleteBtn);
+      card.appendChild(btnDiv);
+
+      container.appendChild(card);
+    });
+    atualizarMedia();
+    document.getElementById('alunosBadge').textContent = alunos.length + ' alunos';
+  }
+
+  function atualizarMedia() {
+    const totalEstrelas = alunos.reduce((acc, a) => acc + a.estrelas, 0);
+    const media = alunos.length > 0 ? (totalEstrelas / alunos.length) : 0;
+    document.getElementById('mediaValue').textContent = media.toFixed(1);
+    const percent = (media / 5) * 100;
+    document.getElementById('mediaBar').style.width = percent + '%';
+  }
+
+  // Delegacao de eventos
+  document.addEventListener('click', function(e) {
+    const target = e.target;
+    // Stars
+    if (target.classList.contains('star')) {
+      const card = target.closest('.card');
+      const index = parseInt(card.dataset.index);
+      const value = parseInt(target.dataset.value);
+      alunos[index].estrelas = value;
+      // Atualizar visual sem renderizar tudo? Melhor rerenderizar para consistencia
+      renderizar();
+      salvar();
+    }
+    // Buttons
+    if (target.classList.contains('btn')) {
+      const action = target.dataset.action;
+      const index = parseInt(target.dataset.index);
+      if (action === 'delete') {
+        alunos.splice(index, 1);
+        renderizar();
+        salvar();
+      }
+      if (action === 'save') {
+        // Salvar comentario e criterios
+        const card = target.closest('.card');
+        const textarea = card.querySelector('.comentario');
+        if (textarea) {
+          alunos[index].comentario = textarea.value;
+        }
+        const checkboxes = card.querySelectorAll('.criterio input');
+        checkboxes.forEach((cb, idx) => {
+          alunos[index].criterios[idx] = cb.checked;
+        });
+        salvar();
+        alert('Salvo!');
+      }
+    }
+    // Modal buttons
+    if (target.id === 'addBtn') {
+      document.getElementById('modal').style.display = 'flex';
+    }
+    if (target.id === 'saveNew') {
+      const name = document.getElementById('newName').value.trim();
+      const status = document.getElementById('newStatus').value;
+      if (name) {
+        alunos.push({
+          id: alunos.length + 1,
+          nome: name,
+          status: status,
+          estrelas: 0,
+          criterios: [false, false, false, false, false],
+          comentario: ''
+        });
+        renderizar();
+        salvar();
+        document.getElementById('modal').style.display = 'none';
+        document.getElementById('newName').value = '';
+      } else {
+        alert('Nome é obrigatório.');
+      }
+    }
+    if (target.id === 'cancelNew') {
+      document.getElementById('modal').style.display = 'none';
+    }
+  });
+
+  // Input events for textarea and checkbox changes to auto-save? We'll save on button click.
+  document.addEventListener('change', function(e) {
+    const target = e.target;
+    if (target.type === 'checkbox' && target.closest('.criterio')) {
+      // We can auto-save or rely on save button. For now, we update on save button.
+    }
+  });
+
+  carregar();
+});
+</script>
+</body>
+</html>

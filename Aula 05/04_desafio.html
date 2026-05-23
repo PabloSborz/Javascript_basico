@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aula 5 - Desafio Laços de Repetição</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f8fafc;
+      color: #1e293b;
+      line-height: 1.6;
+    }
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    .badge {
+      background-color: #3b82f6;
+      color: #fff;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+    }
+    h1 {
+      font-size: 1.8rem;
+      color: #0f172a;
+    }
+    .feedback-btn {
+      background-color: #10b981;
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: opacity 0.3s;
+    }
+    .feedback-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    .context-box {
+      background-color: #e0f2fe;
+      border-left: 4px solid #3b82f6;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 30px;
+    }
+    .two-columns {
+      display: flex;
+      gap: 40px;
+      margin-bottom: 30px;
+    }
+    .column {
+      flex: 1;
+      background: #fff;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    }
+    .column h2 {
+      margin-bottom: 15px;
+      font-size: 1.4rem;
+      border-bottom: 2px solid #e2e8f0;
+      padding-bottom: 8px;
+    }
+    .requisitos-list {
+      list-style: none;
+    }
+    .requisitos-list li {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+      padding: 8px;
+      border-radius: 6px;
+      transition: background 0.2s;
+    }
+    .requisitos-list li.completado {
+      background-color: #d1fae5;
+      text-decoration: line-through;
+      color: #065f46;
+    }
+    .requisitos-list input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+      cursor: pointer;
+    }
+    .entrega-criterios p {
+      margin-bottom: 8px;
+    }
+    .bonus {
+      margin-top: 20px;
+      background-color: #fef3c7;
+      padding: 10px;
+      border-radius: 8px;
+      font-weight: bold;
+    }
+    .cronometro {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      background: #fff;
+      padding: 15px 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+      margin-bottom: 20px;
+    }
+    .cronometro span {
+      font-size: 1.5rem;
+      font-weight: bold;
+      min-width: 60px;
+    }
+    .cronometro button {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 6px;
+      background-color: #3b82f6;
+      color: #fff;
+      cursor: pointer;
+    }
+    .cronometro button.reset {
+      background-color: #ef4444;
+    }
+    .progresso {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+    .progresso-texto {
+      font-size: 1rem;
+      font-weight: 600;
+    }
+    .barra-container {
+      flex: 1;
+      background-color: #e2e8f0;
+      border-radius: 20px;
+      height: 12px;
+      overflow: hidden;
+    }
+    .barra {
+      height: 100%;
+      width: 0%;
+      background-color: #3b82f6;
+      border-radius: 20px;
+      transition: width 0.3s;
+    }
+    .referencia {
+      background-color: #1e293b;
+      color: #f8fafc;
+      padding: 15px;
+      border-radius: 8px;
+      font-family: 'Courier New', monospace;
+      margin-bottom: 20px;
+    }
+    .cta {
+      text-align: center;
+      margin: 20px 0;
+    }
+    .cta a {
+      display: inline-block;
+      background-color: #8b5cf6;
+      color: #fff;
+      padding: 12px 30px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-size: 1.1rem;
+      font-weight: bold;
+      transition: background 0.3s;
+    }
+    .cta a:hover {
+      background-color: #7c3aed;
+    }
+    .mensagem-final {
+      display: none;
+      text-align: center;
+      font-size: 2rem;
+      color: #10b981;
+      margin: 30px 0;
+    }
+    footer {
+      text-align: center;
+      padding: 20px;
+      color: #64748b;
+      font-size: 0.9rem;
+      border-top: 1px solid #e2e8f0;
+      margin-top: 40px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="badge">Desafio Autônomo · 40 min</div>
+      <h1>Missão Laços — repetir, controlar e iterar</h1>
+      <button class="feedback-btn" id="feedbackBtnTop" disabled onclick="window.location.href='05_feedback.html'">Feedback →</button>
+    </header>
+
+    <div class="context-box">
+      <p>Você é um Robô em uma missão de processamento em lote. Precisa repetir tarefas automaticamente usando laços de repetição. Complete os 4 requisitos para ativar o processador em lote.</p>
+    </div>
+
+    <div class="two-columns">
+      <div class="column">
+        <h2>📝 Requisitos</h2>
+        <ul class="requisitos-list" id="requisitosList">
+          <li>
+            <input type="checkbox" id="req1" data-index="0">
+            <label for="req1"><strong>1. Laço for:</strong> Crie um for que exiba números pares de 2 a 10</label>
+          </li>
+          <li>
+            <input type="checkbox" id="req2" data-index="1">
+            <label for="req2"><strong>2. Laço while:</strong> Use while para contar regressivamente de 5 a 1</label>
+          </li>
+          <li>
+            <input type="checkbox" id="req3" data-index="2">
+            <label for="req3"><strong>3. Break:</strong> Crie um for de 1 a 20 que pare ao encontrar um número divisível por 7</label>
+          </li>
+          <li>
+            <input type="checkbox" id="req4" data-index="3">
+            <label for="req4"><strong>4. Laço aninhado:</strong> Use dois for para gerar pares (i, j) de 1 a 3</label>
+          </li>
+        </ul>
+      </div>
+      <div class="column">
+        <h2>📋 O que entregar</h2>
+        <p>Código com for funcional, while com condição, break em loop, laços aninhados</p>
+        <h2>⭐ Critérios</h2>
+        <p>Usou for corretamente<br>Implementou while<br>Controlou fluxo com break<br>Criou laços aninhados</p>
+        <div class="bonus">Bônus 🏆: Usou continue em algum lugar do código</div>
+      </div>
+    </div>
+
+    <div class="cronometro">
+      <span id="timerDisplay">00:00</span>
+      <button id="startBtn">▶ Iniciar Missão</button>
+      <button id="resetBtn" class="reset">⏹ Reset</button>
+    </div>
+
+    <div class="progresso">
+      <span class="progresso-texto" id="progressText">0 / 4 requisitos</span>
+      <div class="barra-container">
+        <div class="barra" id="progressBar"></div>
+      </div>
+    </div>
+
+    <div class="referencia">
+      <code>for (let i = 1; i &lt;= 5; i++) { console.log(i); }</code>
+    </div>
+
+    <div class="cta">
+      <a href="05_feedback.html">➜ Ver Feedback do Professor</a>
+    </div>
+
+    <div id="mensagemFinal" class="mensagem-final">🎉 Missão Cumprida!</div>
+
+    <footer>🏆 Aula 5 · Projeto @karizeviecelli</footer>
+  </div>
+
+  <script>
+    (function() {
+      const checkboxes = document.querySelectorAll('#requisitosList input[type="checkbox"]');
+      const progressText = document.getElementById('progressText');
+      const progressBar = document.getElementById('progressBar');
+      const feedbackBtnTop = document.getElementById('feedbackBtnTop');
+      const mensagemFinal = document.getElementById('mensagemFinal');
+      const timerDisplay = document.getElementById('timerDisplay');
+      const startBtn = document.getElementById('startBtn');
+      const resetBtn = document.getElementById('resetBtn');
+
+      let timerInterval = null;
+      let seconds = 0;
+      let isRunning = false;
+
+      function updateProgress() {
+        let completed = 0;
+        checkboxes.forEach(cb => { if (cb.checked) completed++; });
+        progressText.textContent = `${completed} / 4 requisitos`;
+        const percent = (completed / 4) * 100;
+        progressBar.style.width = percent + '%';
+        // Enable/disable top feedback button
+        if (completed === 4) {
+          feedbackBtnTop.disabled = false;
+          mensagemFinal.style.display = 'block';
+        } else {
+          feedbackBtnTop.disabled = true;
+          mensagemFinal.style.display = 'none';
+        }
+      }
+
+      function formatTime(sec) {
+        const m = String(Math.floor(sec / 60)).padStart(2, '0');
+        const s = String(sec % 60).padStart(2, '0');
+        return m + ':' + s;
+      }
+
+      function startTimer() {
+        if (isRunning) return;
+        isRunning = true;
+        timerInterval = setInterval(() => {
+          seconds++;
+          timerDisplay.textContent = formatTime(seconds);
+        }, 1000);
+        startBtn.textContent = '▶ Executando...';
+      }
+
+      function stopTimer() {
+        clearInterval(timerInterval);
+        isRunning = false;
+        startBtn.textContent = '▶ Iniciar Missão';
+      }
+
+      function resetTimer() {
+        stopTimer();
+        seconds = 0;
+        timerDisplay.textContent = formatTime(0);
+        // Uncheck all requirements
+        checkboxes.forEach(cb => cb.checked = false);
+        updateProgress();
+      }
+
+      // Event listeners
+      checkboxes.forEach(cb => {
+        cb.addEventListener('change', updateProgress);
+      });
+
+      startBtn.addEventListener('click', startTimer);
+      resetBtn.addEventListener('click', resetTimer);
+
+      // Initial state
+      updateProgress();
+    })();
+  </script>
+</body>
+</html>
