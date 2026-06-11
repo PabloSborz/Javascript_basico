@@ -43,19 +43,19 @@ if (vogal === "a" || vogal === "e" || vogal === "i" || vogal === "o" || vogal ==
 }
 */
 //Questão 5
-/*
+
 let nota1 = Number(prompt("Digite a primeira nota:"));
 let nota2 = Number(prompt("Digite a segunda nota:"));
 let nota3 = Number(prompt("Digite a terceira nota:"));
 let media = (nota1 + nota2 + nota3) / 3;
 if (media >= 7) {
     console.log("Aprovado");
-}   else if (media === 10) {
+}   else if (media == 10) {
     console.log("Aprovado com distinção");
 } else {
     console.log("Reprovado");
 }
-*/
+
 //Questao 6
 /*
 let num = Number(prompt("Digite um número:"));
