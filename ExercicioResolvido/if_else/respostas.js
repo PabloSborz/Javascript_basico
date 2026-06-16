@@ -165,7 +165,7 @@ if (salario <= 280) {
     aumento = salario * 0.15;
 }else if (salario >= 700.01 && salario <= 1499.99) {
     aumento = salario * 0.10;
-}else if(salario >= 1500.00 && salario <= 2000.00){
+}else if(salario >= 1500.00){
     aumento = salario * 0.05;
 }else {
     aumento = 0;
